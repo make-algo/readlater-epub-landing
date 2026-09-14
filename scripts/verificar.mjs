@@ -10,6 +10,11 @@
  * mismo formulario que el control, verificado sobre el HTML ya construido de
  * esa ruta — la variante no se da por buena a ojo.
  *
+ * MAK-112 porta la demo real (MAK-101) a las variantes A y B: el check de
+ * jszip-antes-que-epub.min.js/openFailed pasa a leer la fuente de los tres
+ * componentes de Demo en vez del bundle de `dist/`, porque compartir
+ * `src/lib/demo.ts` entre tres componentes lo separa en un chunk propio.
+ *
  *   npm run build && npm run verificar
  */
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
@@ -179,26 +184,41 @@ for (const f of [...paginas, ...hojas]) {
 if (terceros.length) fallos.push(`recursos de dominios ajenos: ${terceros.join(', ')}`)
 else console.log(`ok  sin recursos de terceros (${paginas.length} páginas, ${hojas.length} hojas de estilo)`)
 
-// --- Demo embebida (MAK-101): el EPUB de prueba se publica y el lector
-//     carga jszip ANTES que epub.min.js (si no, book.open() se cuelga sin
-//     error — ver docs/design/02-demo-embebida.md en readlater-epub) y
-//     escucha 'openFailed' además de la resolución de book.loaded.navigation.
+// --- Demo embebida (MAK-101, portada a las variantes en MAK-112): el EPUB
+//     de prueba se publica y las tres variantes cargan jszip ANTES que
+//     epub.min.js (si no, book.open() se cuelga sin error — ver
+//     docs/design/02-demo-embebida.md en readlater-epub) y escuchan
+//     'openFailed' además de la resolución de book.loaded.navigation.
+//
+//     Se comprueba en la FUENTE de cada componente de Demo, no en el bundle
+//     de `dist/`: desde que las tres variantes comparten `src/lib/demo.ts`,
+//     Vite lo separa en un chunk propio y el orden textual de las cadenas
+//     "jszip"/"epubjs" dentro de un bundle ya no refleja el orden real en
+//     que el código los carga.
 if (!existsSync('dist/demo/demo-epub-placeholder.epub'))
   fallos.push('falta dist/demo/demo-epub-placeholder.epub (el EPUB de prueba de la demo)')
 else console.log('ok  demo · EPUB de prueba publicado en dist/demo/')
 
-const bundleJs = ficheros('dist', '.js')
-const bundleConDemo = bundleJs.filter((f) => readFileSync(f, 'utf8').includes('jszip'))
-if (!bundleConDemo.length) fallos.push('ningún bundle de dist/ carga jszip para la demo')
-else {
-  const texto = bundleConDemo.map((f) => readFileSync(f, 'utf8')).join('\n')
-  const posJszip = texto.indexOf('jszip')
-  const posEpubjs = texto.indexOf('epubjs')
-  if (posEpubjs !== -1 && posJszip > posEpubjs) fallos.push('epub.min.js aparece antes que jszip en el bundle de la demo')
-  if (!texto.includes('openFailed')) fallos.push('el bundle de la demo no escucha el evento openFailed de epub.js')
-  if (!fallos.some((f) => f.includes('jszip') || f.includes('openFailed')))
-    console.log('ok  demo · jszip antes que epub.min.js y openFailed escuchado')
+const DEMO_COMPONENTES = [
+  'src/components/secciones/Demo.astro',
+  'src/components/secciones/DemoA.astro',
+  'src/components/secciones/b/Demo.astro',
+]
+const erroresPrevios = fallos.length
+for (const ruta of DEMO_COMPONENTES) {
+  if (!existsSync(ruta)) {
+    fallos.push(`${ruta}: no existe`)
+    continue
+  }
+  const fuente = readFileSync(ruta, 'utf8')
+  const posJszip = fuente.indexOf('loadScript(DEMO_JSZIP_SRC)')
+  const posEpubjs = fuente.indexOf('loadScript(DEMO_EPUBJS_SRC)')
+  if (posJszip < 0 || posEpubjs < 0 || posJszip > posEpubjs)
+    fallos.push(`${ruta}: jszip no se carga antes que epub.min.js`)
+  if (!fuente.includes('openFailed')) fallos.push(`${ruta}: no escucha el evento openFailed de epub.js`)
 }
+if (fallos.length === erroresPrevios)
+  console.log('ok  demo · las tres variantes cargan jszip antes que epub.min.js y escuchan openFailed')
 
 // --- Rutas de todas las variantes publicadas. Solo existe el control por
 //     ahora (MAK-95 es Fase 3; la Fase 4 añade /a/ y /b/ a esta lista).
