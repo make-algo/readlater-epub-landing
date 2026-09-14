@@ -2,12 +2,18 @@
 import { demo } from '../../../content/copy'
 
 /**
- * Variante B — misma demo real que el control (epub.js, tres estados, tabs
- * accesibles en móvil; MAK-101), con la piel "Ya lo conoces": tarjeta
- * agrupada blanca sobre el lienzo gris de sistema, acento azul de sistema,
- * cabeceras redondeadas — los mismos tokens de `tokens-b.css` que ya usa el
- * resto de esta variante. Comportamiento compartido con el control, sin
- * tocar (`src/lib/demo.ts`).
+ * Demo, variante D — "Correspondencia" (Fase 4, ronda 2, MAK-120). Misma
+ * demo real que el control (epub.js, tres estados, tabs accesibles en
+ * móvil; comportamiento de `src/lib/demo.ts` sin tocar). Contexto limpio:
+ * no hereda el marcado de la ronda 1 (MAK-100), aunque la lógica congelada
+ * — ids, `data-slot`, roles ARIA — es la misma en las tres variantes.
+ *
+ * El encuadre, no el contenido: entre las dos columnas hay una ruta
+ * punteada con flecha, origen → destino, el mismo trazo que conecta los
+ * dos matasellos del héroe. La columna de destino lleva la tinta de
+ * "entregado" en su cabecera; la de origen queda apagada, en tinta gastada
+ * — la carta ya salió de ahí. Ningún texto nuevo: `demo.colWeb`/`demo.colEpub`
+ * siguen siendo el copy literal.
  */
 
 const skeletonHtml = `<div class="skeleton">
@@ -27,15 +33,21 @@ const skeletonHtml = `<div class="skeleton">
   <h2>{demo.nombre}</h2>
   <p class="lead" style="margin-top: 0.75rem;">{demo.intro}</p>
 
+  <p class="demo-ruta" aria-hidden="true">
+    <span>Origen</span>
+    <span class="demo-ruta__linea"></span>
+    <span>Destino</span>
+  </p>
+
   <!-- ===== Escritorio / tablet: split-screen ===== -->
   <div class="demo-frame demo-grid" data-view="split">
-    <div class="col">
+    <div class="col col--origen">
       <div class="col-label"><span>{demo.colWeb}</span><span class="src">paulgraham.com</span></div>
       <div class="col-body" data-slot="web">
         <div class="demo-state demo-state--loading" data-role="loading" set:html={skeletonHtml} />
       </div>
     </div>
-    <div class="col">
+    <div class="col col--destino">
       <div class="col-label"><span>{demo.colEpub}</span><span class="src">{demo.colEpubFuente}</span></div>
       <div class="col-body" data-slot="epub">
         <div class="demo-state demo-state--loading" data-role="loading" set:html={skeletonHtml} />
@@ -78,19 +90,23 @@ const skeletonHtml = `<div class="skeleton">
     --demo-ink: var(--color-ink);
     --demo-ink-soft: var(--color-ink-3);
     --demo-line: var(--color-line);
-    --demo-accent: var(--color-accent);
-    --demo-flag: var(--color-accent-strong);
+    --demo-accent: var(--color-accent-2);
+    --demo-flag: var(--color-accent-2-strong);
     --demo-radius: var(--radius);
-    --demo-height: min(72vh, 640px);
+    /* Más bajo que un split-screen de app: el contenido de muestra del
+       EPUB es corto y una caja muy alta deja media columna vacía — un
+       periódico nunca deja así una columna. */
+    --demo-height: min(58vh, 520px);
   }
 
   .demo-frame {
-    margin-top: 2rem;
-    border: 1px solid var(--demo-line);
+    margin-top: 1.25rem;
+    border: 1.5px solid var(--demo-ink);
+    border-top: 3px solid var(--color-accent-2);
     border-radius: var(--demo-radius);
     background: var(--demo-paper);
     color: var(--demo-ink);
-    font-family: var(--font-sans);
+    font-family: var(--font-serif);
     overflow: hidden;
   }
 
@@ -108,12 +124,18 @@ const skeletonHtml = `<div class="skeleton">
   .col + .col {
     border-left: 1px solid var(--demo-line);
   }
+  /* El origen queda en tinta gastada: la carta ya salió de ahí. El destino
+     lleva la tinta de "entregado" en su cabecera — mismo verde del sello
+     de la comparativa, para que se lea como el mismo sistema. */
+  .col--origen .col-label { color: var(--demo-ink-soft); }
+  .col--destino .col-label { border-bottom-color: var(--color-check); }
+  .col--destino .col-label .src { color: var(--color-check); }
 
   .col-label {
     font-family: var(--font-sans);
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--demo-ink-soft);
     padding: 0.625rem 1rem;
@@ -168,7 +190,7 @@ const skeletonHtml = `<div class="skeleton">
   .sk-line {
     height: 12px;
     margin-bottom: 12px;
-    border-radius: 4px;
+    border-radius: 2px;
     background: linear-gradient(90deg, var(--demo-paper-dim), var(--demo-line), var(--demo-paper-dim));
     background-size: 200% 100%;
     animation: demo-sk-pulse 1.6s ease-in-out infinite;
@@ -201,7 +223,7 @@ const skeletonHtml = `<div class="skeleton">
     display: block;
     width: 100%;
     height: auto;
-    filter: grayscale(0.15);
+    filter: grayscale(0.15) sepia(0.08);
   }
   .fallback-flag {
     position: sticky;
@@ -209,7 +231,7 @@ const skeletonHtml = `<div class="skeleton">
     left: 0;
     right: 0;
     font-family: var(--font-sans);
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     background: var(--demo-paper);
     color: var(--demo-flag);
     border-bottom: 1px solid var(--demo-line);
@@ -234,13 +256,13 @@ const skeletonHtml = `<div class="skeleton">
     overflow-y: auto;
     padding: 0.75rem 0;
     font-family: var(--font-sans);
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
   }
   .toc h3 {
     font-family: var(--font-sans);
     font-size: 0.6875rem;
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--demo-ink-soft);
     margin: 0 1rem 0.5rem;
@@ -274,6 +296,7 @@ const skeletonHtml = `<div class="skeleton">
   }
   .reader-viewport h4 {
     font-family: var(--font-serif);
+    font-style: italic;
     font-size: 1.25rem;
     margin: 0 0 0.25rem;
     color: var(--demo-ink);
@@ -290,7 +313,7 @@ const skeletonHtml = `<div class="skeleton">
 
   .demo-caption {
     font-family: var(--font-sans);
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     color: var(--demo-ink-soft);
     margin-top: 0.875rem;
     max-width: 45rem;
@@ -316,20 +339,20 @@ const skeletonHtml = `<div class="skeleton">
     .tablist [role='tab'] {
       flex: 1 1 50%;
       font-family: var(--font-sans);
-      font-size: 0.8125rem;
+      font-size: 0.75rem;
       font-weight: 600;
-      letter-spacing: 0.01em;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      background: var(--demo-paper);
+      background: transparent;
       color: var(--demo-ink-soft);
       border: 0;
+      border-bottom: 3px solid transparent;
       padding: 0.875rem 0.5rem;
       cursor: pointer;
     }
     .tablist [role='tab'][aria-selected='true'] {
       color: var(--demo-ink);
-      background: var(--demo-paper-dim);
-      box-shadow: inset 0 -3px 0 var(--demo-accent);
+      border-bottom-color: var(--demo-accent);
     }
     .demo-panel {
       display: none;

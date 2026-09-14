@@ -2,35 +2,29 @@
 import { hero } from '../../../content/copy'
 
 /**
- * Héroe, variante B (Fase 4, MAK-100) — ronda 3 tras dos críticas ciegas
- * (6/2 y 5/2: "podría ser cualquier SaaS", "nada dice libro o Kindle").
- * Se retira el color decorativo sin criterio (los cuadrados de color por
- * dominio) y se sustituye el gesto central por uno que sí es exclusivo de
- * "esto se convierte en un libro": puntos guía entre título y número de
- * página, el mismo recurso tipográfico de un índice impreso — o el de
- * Apple Books — no un icono de librería. El gráfico muestra el arco
- * completo sin repetir la demo: arriba, los enlaces tal como llegan
- * (guardados, con dominio, el enlace ENRIQUECIDO real de Recordatorios que
- * ninguna API pública expone); abajo, esos mismos títulos ya convertidos
- * en índice, con folio.
+ * Héroe, variante D — "Correspondencia" (Fase 4, ronda 2, MAK-120). Contexto
+ * limpio: no parte del héroe de la ronda 1 (MAK-100, "Ya lo conoces"),
+ * borrado en este mismo cambio.
+ *
+ * El argumento no es "una app hace algo": es que un enlace guardado está en
+ * el sitio equivocado (el móvil) y esto lo reubica en el sitio correcto (el
+ * Kindle) — tratado literalmente como una pieza de correo que se reexpide.
+ * El bloque de la derecha son dos matasellos conectados por la ruta de
+ * reexpedición: MÓVIL, tachado con el mismo trazo rojo del sello; KINDLE,
+ * sellado en la tinta de "entregado". Ningún icono de sobre de librería —
+ * el propio matasellos, mecanografiado, es el material.
+ *
+ * La página no centra el bloque: el titular cuelga de una regla vertical,
+ * como el margen de una hoja pautada, con el bloque de remite compensando
+ * a la derecha en vez de debajo — asimetría real, no una columna con aire.
  *
  * Copy literal de `hero.*`, sin tocar.
  */
-
-const guardados = [
-  { dominio: 'nytimes.com', titulo: 'El caso de la lectura larga en e-ink' },
-  { dominio: 'newyorker.com', titulo: 'Notas sobre escribir con calma' },
-  { dominio: 'aeon.co', titulo: 'Un repaso a la semana en enlaces' },
-]
-
-const convertidos = [
-  { titulo: 'El caso de la lectura larga en e-ink', folio: 27 },
-  { titulo: 'Notas sobre escribir con calma', folio: 11 },
-]
 ---
 
-<section id="hero" class="wrap" style="padding-top: clamp(2.5rem, 6vw, 4.5rem); display: grid; gap: clamp(2.5rem, 6vw, 4rem); align-items: start;">
-  <div>
+<section id="hero" class="wrap hero-carta">
+  <div class="direccion">
+    <p class="eyebrow">Correspondencia</p>
     <h1>{hero.titular}</h1>
     <p class="lead" style="margin-top: 1.25rem;">{hero.subtitulo}</p>
     <p style="margin-top: 1.75rem;">
@@ -38,44 +32,62 @@ const convertidos = [
     </p>
   </div>
 
-  <div aria-hidden="true">
-    <p class="eyebrow">Recordatorios</p>
-    <div style="margin-top: 0.75rem; border-top: 1px solid var(--color-line);">
-      {
-        guardados.map((g) => (
-          <div class="linkrow">
-            <span>
-              <span class="linkrow__titulo">{g.titulo}</span>
-              <span class="linkrow__dominio">{g.dominio}</span>
-            </span>
-            <svg class="linkrow__check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="var(--color-ink-3)" stroke-width="1.6" /></svg>
-          </div>
-        ))
-      }
+  <div class="hero-carta__sello" aria-hidden="true">
+    <div class="redireccion">
+      <span class="redireccion__sello redireccion__sello--tachado"><span>Móvil</span></span>
+      <svg class="redireccion__flecha" width="34" height="16" viewBox="0 0 34 16">
+        <path d="M1 8h26M20 1.5l7 6.5-7 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 3" />
+      </svg>
+      <span class="redireccion__sello redireccion__sello--destino">Kindle</span>
     </div>
-
-    <p class="eyebrow" style="margin-top: 1.75rem; display: flex; align-items: center; gap: 0.5rem;">
-      <svg width="14" height="14" viewBox="0 0 24 14" style="flex:none;"><path d="M1 7h20M15 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-      Convertidos
-    </p>
-    <div style="margin-top: 0.5rem; border-top: 1px solid var(--color-line);">
-      {
-        convertidos.map((c) => (
-          <div class="indexrow">
-            <svg class="indexrow__check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="var(--color-check)" /><path d="M7.5 12.5 L10.3 15.3 L16.5 8.5" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-            <span class="indexrow__titulo">{c.titulo}</span>
-            <span class="indexrow__leader"></span>
-            <span class="indexrow__folio">{c.folio}</span>
-          </div>
-        ))
-      }
-    </div>
+    <p class="hero-carta__leyenda"><span></span>Reexpedido</p>
   </div>
 </section>
 
 <style>
-  #hero { grid-template-columns: 1fr; }
+  .hero-carta {
+    padding-top: clamp(2.5rem, 6vw, 4.5rem);
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 4rem);
+    align-items: end;
+  }
+  .hero-carta__sello {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    justify-self: start;
+  }
+  .hero-carta__leyenda {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+  }
+  .hero-carta__leyenda span {
+    display: block;
+    width: 1rem;
+    height: 2px;
+    background: var(--color-ink-3);
+  }
   @media (min-width: 56rem) {
-    #hero { grid-template-columns: minmax(0, 1fr) minmax(0, 24rem); }
+    .hero-carta__leyenda { flex-direction: row-reverse; }
+  }
+
+  @media (min-width: 56rem) {
+    .hero-carta {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+      align-items: end;
+    }
+    .hero-carta__sello {
+      justify-self: end;
+      align-items: flex-end;
+      text-align: right;
+      padding-bottom: 0.5rem;
+    }
   }
 </style>

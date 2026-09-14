@@ -2,12 +2,16 @@
 import { comparativa } from '../../../content/copy'
 
 /**
- * Sección 4 — Comparativa, variante B (Fase 4, MAK-100) — ronda 2. Mismo
- * copy y mismo argumento que el control. Dos filas sueltas sobre el lienzo,
- * sin tarjeta ni fondo de color — el crítico de la ronda 1 señaló que la
- * tarjeta con fondo azul mezclaba vocabulario de formulario con lo que es
- * una comparación editorial. El check en verde ya dice cuál gana; no hace
- * falta subrayarlo también con un fondo.
+ * Comparativa, variante D — "Correspondencia" (Fase 4, ronda 2, MAK-120).
+ * Contexto limpio: no parte de la comparativa de la ronda 1 (MAK-100), de
+ * dos filas sueltas — esta empieza de cero.
+ *
+ * Nada de tarjetas iguales con relleno distinto: texto corrido, como el
+ * cuerpo de una carta, con la corrección al margen — el gesto de un
+ * corrector de galeradas tachando una entrega y aprobando la otra, mismo
+ * copy literal de `comparativa.*`, reordenado en prosa en vez de en grid.
+ * La marca es tipográfica (tachado / subrayado), no una insignia de check
+ * o cruz — eso ya es vocabulario de tabla de precios de SaaS.
  */
 ---
 
@@ -15,25 +19,27 @@ import { comparativa } from '../../../content/copy'
   <p class="eyebrow">Comparativa</p>
   <h2>{comparativa.nombre}</h2>
 
-  <div style="margin-top: 2rem; max-width: 42rem; border-top: 1px solid var(--color-line);">
-    <div class="linkrow" data-fila-comparativa>
-      <svg class="listrow__check" viewBox="0 0 24 24" width="24" height="24" style="flex:none; margin-top:0.15rem;"><circle cx="12" cy="12" r="9.5" fill="none" stroke="var(--color-ink-3)" stroke-width="1.6" /></svg>
-      <div>
+  <div class="carta">
+    <div class="carta__fila">
+      <div class="carta__parrafo">
         <h3>{comparativa.sendToKindle.titulo}</h3>
-        <p style="margin-top: 0.35rem; color: var(--color-ink-2);">{comparativa.sendToKindle.texto}</p>
+        <p>{comparativa.sendToKindle.texto}</p>
+      </div>
+      <div class="carta__nota carta__nota--rechazo">
+        <span>{comparativa.sendToKindle.titulo}</span>
       </div>
     </div>
-    <div class="linkrow" data-fila-comparativa>
-      <svg class="listrow__check" viewBox="0 0 24 24" width="24" height="24" style="flex:none; margin-top:0.15rem;">
-        <circle cx="12" cy="12" r="9.5" fill="var(--color-check)" />
-        <path d="M7.5 12.5 L10.3 15.3 L16.5 8.5" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-      <div>
-        <h3>{comparativa.readlater.titulo}</h3>
-        <p style="margin-top: 0.35rem; color: var(--color-ink-2);">{comparativa.readlater.texto}</p>
-      </div>
-    </div>
-  </div>
 
-  <p class="lead" style="margin-top: 1.5rem;">{comparativa.otros}</p>
+    <div class="carta__fila">
+      <div class="carta__parrafo">
+        <h3>{comparativa.readlater.titulo}</h3>
+        <p>{comparativa.readlater.texto}</p>
+      </div>
+      <div class="carta__nota carta__nota--aprobado">
+        <span>{comparativa.readlater.titulo}</span>
+      </div>
+    </div>
+
+    <p class="lead carta__cierre">{comparativa.otros}</p>
+  </div>
 </section>

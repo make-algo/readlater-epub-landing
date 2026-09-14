@@ -4,10 +4,11 @@ import { absoluteUrl, url } from '../lib/site'
 import { site, saltar } from '../content/copy'
 
 /**
- * Layout de la variante B (Fase 4, MAK-100) — idéntico a `Base.astro` salvo
- * la hoja de estilos que importa. Se duplica en vez de parametrizar `Base`
- * porque un import de Astro es estático: no se puede elegir la hoja por
- * prop sin condicionar el bundle del control también.
+ * Layout de la ruta `/b/` (Fase 4, ronda 2: variante D "Correspondencia",
+ * MAK-120) — idéntico a `Base.astro` salvo la hoja de estilos que importa.
+ * Se duplica en vez de parametrizar `Base` porque un import de Astro es
+ * estático: no se puede elegir la hoja por prop sin condicionar el bundle
+ * del control también.
  */
 
 interface Props {
