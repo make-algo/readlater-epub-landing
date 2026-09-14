@@ -2,10 +2,10 @@
 import { comparativa } from '../../content/copy'
 
 /**
- * Variante A — la comparativa como anotación al margen de un libro, no como
- * tarjetas: la opción descartada lleva un subrayado ondulado (la duda a
- * lápiz), la elegida un subrayado sólido en el acento (la marca de quien ya
- * decidió). Mismo copy y mismo orden que el control.
+ * Variante C — la comparativa como tabla de contenidos editorial: numeral en
+ * serif itálica, filete doble como cabecera de tabla, filas separadas por
+ * hairlines y la fila elegida marcada por un lomo de acento — no dos
+ * columnas gemelas ni dos tarjetas. Mismo copy y mismo orden que el control.
  */
 ---
 
@@ -13,21 +13,29 @@ import { comparativa } from '../../content/copy'
   <p class="eyebrow">Comparativa</p>
   <h2>{comparativa.nombre}</h2>
 
-  <div class="marginalia">
-    <div class="marginalia--descartada">
-      <span class="num">1.</span>
-      <div>
-        <h3>{comparativa.sendToKindle.titulo}</h3>
-        <p style="margin-top: 0.3rem; color: var(--color-ink-2);">{comparativa.sendToKindle.texto}</p>
-      </div>
-    </div>
-    <div class="marginalia--elegida">
-      <span class="num">2.</span>
-      <div>
-        <h3>{comparativa.readlater.titulo}</h3>
-        <p style="margin-top: 0.3rem; color: var(--color-ink-2);">{comparativa.readlater.texto}</p>
-      </div>
-    </div>
+  <div class="tabla-editorial-wrap">
+    <table class="tabla-editorial">
+      <caption class="sr-only">Comparativa entre Send to Kindle y ReadLater EPUB</caption>
+      <thead>
+        <tr>
+          <th scope="col">N.º</th>
+          <th scope="col">Opción</th>
+          <th scope="col">Qué te da</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="fila-descartada">
+          <td class="num">01</td>
+          <td><h3>{comparativa.sendToKindle.titulo}</h3></td>
+          <td>{comparativa.sendToKindle.texto}</td>
+        </tr>
+        <tr class="fila-elegida">
+          <td class="num">02</td>
+          <td><h3>{comparativa.readlater.titulo}</h3></td>
+          <td>{comparativa.readlater.texto}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <p class="lead" style="margin-top: 1.5rem;">{comparativa.otros}</p>

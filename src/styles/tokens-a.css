@@ -1,49 +1,46 @@
 /* ============================================================================
-   ReadLater EPUB — variante A: "El objeto es el mensaje" (Fase 4, MAK-99)
-   La pantalla del lector, no la sobrecubierta: gris cálido de e-ink en vez del
-   crema del control, un único acento (el lápiz rojo con el que se anota un
-   libro prestado, no el sepia de tapa dura), y una sola familia tipográfica
-   para todo — también botones y formulario. La retícula única sigue viviendo
-   en `--wrap`; lo que cambia es que aquí se comporta como página de libro:
-   ver `variant-a.css` para el cabecero de página y el folio.
+   ReadLater EPUB — variante C: "Revista editorial" (Fase 4 ronda 2, MAK-123)
+   Maquetación de prensa, no interfaz de app: retícula asimétrica de columnas,
+   filetes en vez de tarjetas y sombras, serif de titular con carácter real +
+   grotesca de sistema para kickers y numeración. El acento vive en filetes y
+   numerales, nunca como el único recurso decorativo de una paleta plana.
+   Paleta propia (tinta azul marino sobre papel crema), sin relación con el
+   lápiz rojo ni el resto de sistemas usados en rondas anteriores.
    ========================================================================= */
 
 @theme {
-  --color-paper:        #EBE8DF; /* pantalla e-ink en reposo, gris-cálido    */
-  --color-paper-sunk:   #DFDACB; /* banda de conversión                     */
-  --color-paper-raised: #F6F4EC; /* la página, más clara que la pantalla    */
+  --color-paper:        #F4EFE2; /* papel de prensa, crema cálido            */
+  --color-paper-sunk:   #E8E0CB; /* banda de conversión                     */
+  --color-paper-raised: #FFFFFF; /* páginas del spread, formulario          */
 
-  --color-ink:          #17140D; /* tinta de impresión                      */
-  --color-ink-2:        #47432F; /* texto secundario                        */
-  --color-ink-3:        #6B6650; /* cabecero de página, folios              */
+  --color-ink:          #1B1B18; /* tinta principal                         */
+  --color-ink-2:        #4A473C; /* texto secundario                        */
+  --color-ink-3:        #7C765F; /* kickers, numerales, running head        */
 
-  --color-line:         #C9C1A4; /* hairline entre páginas                  */
-  --color-border:       #85795B; /* borde de control de formulario          */
+  --color-line:         #CCC2A2; /* filetes de separación                   */
+  --color-border:       #8B8462; /* borde de control de formulario          */
 
-  --color-accent:       #A3301F; /* lápiz rojo de anotación de margen       */
-  --color-accent-strong:#7C2417;
-  --color-accent-wash:  #F1DFD6;
+  --color-accent:       #1F3A5F; /* tinta azul marino — filetes y numerales */
+  --color-accent-strong:#12253E;
+  --color-accent-wash:  #DEE4EA;
 
   --color-error:        #A32116;
 
-  /* Una sola familia para toda la página, interfaz incluida: rompe a
-     propósito la convención de "sans para UI, serif para lectura". El
-     objeto entero es el libro; no hay interfaz aparte del contenido. */
-  --font-serif: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", serif;
-  --font-sans:  Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", serif;
+  /* Serif de titular con presencia real de peso; grotesca de sistema para
+     kickers, tabla y etiquetas — el par clásico de una cabecera de revista. */
+  --font-serif: Charter, "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
+  --font-sans:  -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
 
-  /* Salto de escala deliberadamente agresivo respecto al control: el
-     titular es la portada del libro, no un h1 de landing SaaS. */
-  --text-display: clamp(2.75rem, 1.3rem + 7vw, 6.75rem);
+  --text-display: clamp(2.25rem, 1.35rem + 3.6vw, 3.75rem);
   --text-h2:      clamp(1.375rem, 1.1rem + 1.4vw, 2.125rem);
   --text-h3:      clamp(1.125rem, 1rem + 0.6vw, 1.375rem);
   --text-body:    1.0625rem;
   --text-small:   0.9375rem;
 
   --wrap: 68rem;
-  --radius: 0.125rem; /* casi recto: nada de esquinas redondeadas de app */
+  --radius: 0; /* nada de esquinas redondeadas de sistema operativo */
 
   --focus-width: 3px;
   --focus-offset: 2px;
-  --color-focus: #17140D;
+  --color-focus: #1B1B18;
 }
