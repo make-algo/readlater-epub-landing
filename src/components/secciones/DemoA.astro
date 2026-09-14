@@ -1,0 +1,43 @@
+---
+import { url } from '../../lib/site'
+import { demo } from '../../content/copy'
+
+/**
+ * Variante A — Demo como página de libro abierta: dos hojas, el índice a la
+ * izquierda y una página de artículo a la derecha, con el pliegue central
+ * como único elemento decorativo (sombra, no color). Mismo contenido que el
+ * control — el mismo bloqueo documentado en MAK-91/93/94, mismo marcador
+ * `data-placeholder` que exige `scripts/verificar.mjs` — solo cambia cómo se
+ * presenta: la maqueta es la demostración del propio objeto (el libro),
+ * en vez de una captura de pantalla rotulada.
+ */
+---
+
+<section id="demo" class="wrap">
+  <p class="eyebrow">Demo</p>
+  <h2>{demo.nombre}</h2>
+  <p class="lead" style="margin-top: 0.75rem;">{demo.intro}</p>
+
+  <div class="spread">
+    <figure>
+      <img
+        src={url('/demo/indice-placeholder-a.svg')}
+        alt={demo.indiceAlt}
+        width="640"
+        height="640"
+        loading="lazy"
+        data-placeholder={demo.placeholderId}
+      />
+    </figure>
+    <figure>
+      <img
+        src={url('/demo/pagina-placeholder-a.svg')}
+        alt={demo.paginaAlt}
+        width="640"
+        height="640"
+        loading="lazy"
+      />
+    </figure>
+  </div>
+  <p class="spread-caption">{demo.rotulo}</p>
+</section>
