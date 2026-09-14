@@ -1,190 +1,288 @@
 /* ============================================================================
-   ReadLater EPUB — variante A, capa sistémica del "objeto como mensaje".
-   El material es el libro físico: cabecero de página, folio, corte entre
-   páginas, sello en vez de botón, anotación al margen. Se aplica sobre las
-   reglas heredadas de `base.css` para que las secciones que la variante NO
-   maqueta a mano (Cómo funciona, Privacidad, CTA, FAQ) hereden el sistema sin
-   tocar su composición — solo cambian los tokens y esta capa. Nada aquí
-   contradice `prefers-reduced-motion`, ya resuelto en `base.css`.
+   ReadLater EPUB — variante C, capa sistémica de "Revista editorial"
+   (Fase 4 ronda 2, MAK-123). El material es la maqueta de prensa: masthead
+   con filete, kicker + numeral en vez de tarjeta, tabla de contenidos en vez
+   de columnas gemelas, spread de doble página en vez de mockup de dispositivo.
+   Se aplica sobre `base.css` para que Cómo funciona, Privacidad, CTA y FAQ
+   —que esta ronda no maqueta a mano— hereden la identidad (tipografía, color,
+   ausencia de radio) sin cambiar su composición. Nada de aquí contradice
+   `prefers-reduced-motion`, ya resuelto en `base.css`.
    ========================================================================= */
 
 @layer components {
-  /* -- Cabecera del sitio, estrecha ---------------------------------------
-     `Header.astro` (heredado) pone logo y CTA en una sola fila sin
-     `flex-wrap`; con esta tipografía en versalitas el botón es más ancho
-     que en el control y a partir de ~400px se solapa con el logo. Se
-     resuelve aquí, sin tocar el componente compartido. */
+  /* -- Masthead de cabecera ------------------------------------------------
+     Filete superior e inferior, como la cabecera de un periódico: el nombre
+     de lectura en serif con tracking negativo, el CTA de refuerzo en
+     versalitas grotescas — nunca un botón sólido aquí, la conversión real
+     vive en la sección CTA. */
   body > header.wrap {
-    flex-wrap: wrap;
-    row-gap: 0.6rem;
+    border-block: 1px solid var(--color-line);
+    padding-block: 1.15rem;
   }
-
-  /* -- Cabecero de página -----------------------------------------------
-     El `.eyebrow` pasa a versalitas itálicas sin regla propia: la única
-     regla que marca "aquí empieza otra página" es el corte entre secciones
-     de más abajo. Repetir label+regla+label+regla siete veces es el
-     muletón de plantilla editorial que señaló la primera ronda de crítica;
-     con la regla quitada, el folio en el margen es lo que hace ese trabajo. */
-  .eyebrow {
+  .marca-texto {
     font-family: var(--font-serif);
-    font-style: italic;
-    font-weight: 400;
-    font-size: 0.8125rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-ink-3);
-    display: block;
-  }
-
-  /* -- H1: portada, no h1 de landing --------------------------------------
-     Tracking negativo agresivo y una sola voz de peso: la escala hace el
-     trabajo de jerarquía. La capitular en el acento repite en el titular
-     el mismo gesto que abre la página de artículo en la demo — el mismo
-     material, no un adorno suelto. */
-  h1 {
-    letter-spacing: -0.03em;
-    line-height: 0.97;
-    text-wrap: balance;
-  }
-  h1::first-letter {
-    color: var(--color-accent);
-  }
-
-  /* -- Folio ---------------------------------------------------------
-     Numeral romano, no "01/02/03" — ese es justo el tic de plantilla
-     editorial que delata a un kit de landing. Un folio en romanos, fino,
-     en el margen izquierdo, es lo que lleva una portadilla de libro de
-     verdad. Las siete secciones son las siete páginas del libro. */
-  body { counter-reset: folio; }
-  main > section,
-  #hero {
-    counter-increment: folio;
-    position: relative;
-  }
-  main > section::after,
-  #hero::after {
-    content: counter(folio, upper-roman);
-    position: absolute;
-    left: 1.5rem;
-    bottom: 1.5rem;
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: 1.5rem;
-    color: var(--color-ink-3);
-    opacity: 0.5;
-    letter-spacing: 0.04em;
-  }
-
-  /* -- Corte entre páginas, recto/verso -----------------------------------
-     Sombra alta y tenue en el borde superior de cada sección (salvo la
-     primera) simulando el filo de una página. Además, las páginas pares
-     llevan un tinte de papel apenas distinto — el gesto real de un libro
-     abierto, donde la hoja de la derecha nunca es idéntica a la de la
-     izquierda — así las siete secciones dejan de leerse como la misma
-     plantilla copiada siete veces. */
-  main > section:not(:first-of-type) {
-    box-shadow: inset 0 9px 7px -9px rgb(0 0 0 / 0.16);
-  }
-  main > section:nth-of-type(even):not(.banda) {
-    background: color-mix(in srgb, var(--color-paper) 94%, var(--color-ink) 6%);
-  }
-
-  /* -- Botón como sello --------------------------------------------------
-     Nada de píldora redondeada: un sello de biblioteca, versalitas. El
-     mismo CTA se repite cuatro veces en la página (cabecera, héroe, lista
-     de espera, FAQ) — para que no lea como el mismo botón pegado cuatro
-     veces, solo uno lleva tinta sólida: el de conversión real al final del
-     argumento (héroe y sección de lista de espera). Los de paso —
-     cabecera y cierre del FAQ, que solo llevan de vuelta al mismo
-     formulario — quedan en hueco, como una referencia, no una repetición. */
-  .btn {
-    font-family: var(--font-serif);
-    font-style: normal;
     font-weight: 700;
+    letter-spacing: -0.01em;
+    font-size: 1.3125rem;
+  }
+  .marca-formato {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+  }
+  .site-header .btn-ghost {
+    font-family: var(--font-sans);
     text-transform: uppercase;
     letter-spacing: 0.08em;
+    font-size: 0.8125rem;
+    font-weight: 700;
+  }
+
+  /* -- Kicker editorial -----------------------------------------------------
+     Versalitas grotescas + una regleta corta en el acento debajo: la marca
+     de "esto es una sección de un impreso", no una etiqueta de sistema. */
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+    padding-bottom: 0.6rem;
+  }
+  .eyebrow::after {
+    content: '';
+    display: block;
+    width: 2.25rem;
+    height: 2px;
+    margin-top: 0.55rem;
+    background: var(--color-accent);
+  }
+
+  /* -- Filete entre secciones, no tarjeta ni banda de fondo ---------------- */
+  main > section:not(#hero) {
+    border-top: 1px solid var(--color-line);
+  }
+
+  /* -- H1: escala de titular de portada, sin centrar ---------------------- */
+  h1 {
+    letter-spacing: -0.015em;
+    line-height: 1.04;
+    text-wrap: balance;
+  }
+
+  /* -- Héroe como portadilla de revista: retícula asimétrica de tres
+     columnas — la franja de kicker, el titular (columnas 4-9) y el
+     subtítulo/CTA (columnas 6-13, desplazado y más ancho que el titular).
+     Ningún elemento comparte el mismo ancho de columna que otro: es la
+     regla que rompe la maqueta de columna única. --------------------------- */
+  .hero-masthead {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: 1.75rem;
+    row-gap: 1.75rem;
+    align-items: start;
+    padding-block: clamp(3rem, 7vw, 5.5rem) clamp(2.5rem, 5vw, 4rem);
+  }
+  .hero-masthead-meta {
+    grid-column: 1 / 4;
+    border-right: 2px solid var(--color-accent);
+    padding-right: 1.5rem;
+  }
+  .hero-masthead-meta .hero-marca {
+    margin-top: 1.5rem;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--color-ink-3);
+    line-height: 1.7;
+  }
+  .hero-masthead-copy {
+    grid-column: 4 / 10;
+  }
+  .hero-masthead-support {
+    grid-column: 6 / 13;
+    margin-top: 0.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-line);
+  }
+  @media (max-width: 46rem) {
+    .hero-masthead-meta,
+    .hero-masthead-copy,
+    .hero-masthead-support {
+      grid-column: 1 / -1;
+    }
+    .hero-masthead-meta {
+      border-right: 0;
+      border-bottom: 2px solid var(--color-accent);
+      padding-right: 0;
+      padding-bottom: 1.25rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+    }
+    .hero-masthead-meta .hero-marca { margin-top: 0; }
+  }
+
+  /* -- Botón: sello rectangular de prensa, nunca píldora ------------------- */
+  .btn {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
     font-size: var(--text-small);
-    padding: 0.7rem 1.6rem;
-    border-radius: var(--radius);
-  }
-  header.wrap .btn,
-  #faq .btn {
-    background: transparent;
-    color: var(--color-ink);
-    border-color: var(--color-ink);
-  }
-  header.wrap .btn:hover,
-  #faq .btn:hover {
-    background: var(--color-ink);
-    color: var(--color-paper);
-    border-color: var(--color-ink);
   }
 
-  /* -- El rojo se raciona ---------------------------------------------
-     La primera ronda lo repartía en enlaces, botones, avisos y bordes por
-     igual y dejaba de leerse como acento. Aquí el rojo vive solo en tres
-     sitios: el botón de conversión, el subrayado de la opción elegida en
-     la comparativa y la capital de la página de artículo. Todo lo demás —
-     enlaces de cuerpo, foco, avisos — se queda en tinta. */
-  a { color: var(--color-ink); text-decoration: underline; text-decoration-color: var(--color-line); text-underline-offset: 0.18em; }
-  a:hover { color: var(--color-ink); text-decoration-color: var(--color-ink); }
-  .btn { color: var(--color-paper); } /* el botón es la única superficie sólida de acento */
-
-  .notice, .alert {
-    border-radius: 0;
-    font-family: var(--font-serif);
-    font-style: italic;
-  }
-  .notice { background: var(--color-paper-raised); border-color: var(--color-line); color: var(--color-ink-2); }
-
-  /* -- Formulario en el mismo registro ------------------------------------ */
+  /* -- Formulario en el mismo registro tipográfico -------------------------
+     Los controles nativos del navegador (radio circular, input con borde de
+     sistema) eran el único punto de la página que rompía el registro
+     editorial — señalado en la crítica a ciegas. Se sustituyen por un campo
+     subrayado (filete, no caja) y una casilla cuadrada dibujada a mano con
+     `appearance:none`, coherentes con el resto de la maqueta. */
   .field label,
   legend {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-weight: 400;
-  }
-  .radio { font-family: var(--font-serif); }
-  input[type='radio'] { accent-color: var(--color-ink); }
-  .field input[type='email'] { border-radius: 0; }
-
-  /* -- Demo: estilos propios en `DemoA.astro` (MAK-112) ------------------- */
-
-  /* -- Comparativa: notas al margen, no tarjetas -------------------------- */
-  .marginalia {
-    margin-top: 2.5rem;
-    display: grid;
-    gap: 1.75rem;
-    max-width: 42rem;
-    border-top: 1px solid var(--color-line);
-    padding-top: 1.5rem;
-  }
-  .marginalia > div { display: flex; gap: 0.9rem; }
-  .marginalia .num {
-    font-family: var(--font-serif);
-    font-style: italic;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 700;
     color: var(--color-ink-3);
-    flex: none;
   }
-  .marginalia h3 {
-    display: inline;
-    font-size: 1.375rem;
+  .field input[type='email'] {
+    border: 0;
+    border-bottom: 1.5px solid var(--color-border);
+    border-radius: 0;
+    background: transparent;
+    padding-inline: 0;
+    font-size: 1.0625rem;
   }
-  .marginalia--descartada h3 {
-    color: var(--color-ink-2);
-    text-decoration: underline wavy var(--color-line) 1px;
-    text-underline-offset: 0.25rem;
+  .field input[type='email']:focus-visible { border-bottom-color: var(--color-ink); }
+  .field--bad input[type='email'] { border-bottom-color: var(--color-error); }
+  .cta-panel .field input[type='email'] {
+    background: transparent;
+    color: var(--color-paper);
+    border-bottom-color: var(--color-paper);
   }
-  .marginalia--elegida h3 {
-    text-decoration: underline solid var(--color-accent) 2px;
-    text-underline-offset: 0.25rem;
-  }
-  .marginalia--elegida .num { color: var(--color-accent); font-style: normal; font-weight: 700; }
+  .cta-panel .field input[type='email']:focus-visible { border-bottom-color: var(--color-paper); }
+  .cta-panel .field input[type='email']::placeholder { color: color-mix(in srgb, var(--color-paper) 60%, transparent); }
 
-  /* -- FAQ: cada pregunta como entrada de página, no una lista plana ------ */
-  #faq dt h3 { font-weight: 700; }
-  #faq dl > div:not(:first-child) {
-    border-top: 1px solid var(--color-line);
-    padding-top: 1.5rem;
+  input[type='radio'] {
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    border: 1.5px solid currentColor;
+    display: inline-block;
+    position: relative;
+    margin: 0;
+    cursor: pointer;
   }
+  input[type='radio']:checked::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: var(--color-accent);
+  }
+  .cta-panel input[type='radio']:checked::after { background: var(--color-paper); }
+  input[type='radio']:focus-visible { outline: var(--focus-width) solid var(--color-focus); outline-offset: var(--focus-offset); }
+
+  /* -- Comparativa: tabla editorial, no columnas gemelas -------------------
+     Ver `ComparativaA.astro`: índice a dos filas con numeral, filete superior
+     de doble grosor como cabecera de tabla de contenidos, y la fila elegida
+     marcada por un lomo de acento en vez de una tarjeta con más color. */
+  .tabla-editorial-wrap {
+    margin-top: 2.5rem;
+    max-width: 54rem;
+    overflow-x: auto;
+  }
+  .tabla-editorial {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .tabla-editorial thead th {
+    text-align: left;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--color-ink-3);
+    padding-block: 0.7rem;
+    border-bottom: 2px solid var(--color-ink);
+    white-space: nowrap;
+  }
+  .tabla-editorial td {
+    padding-block: 1.5rem;
+    padding-inline-end: 1.75rem;
+    vertical-align: top;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .tabla-editorial .num {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.625rem;
+    color: var(--color-ink-3);
+    width: 3.25rem;
+  }
+  .tabla-editorial td h3 { display: inline; }
+  .tabla-editorial td p { margin-top: 0.4rem; color: var(--color-ink-2); }
+  .tabla-editorial tr.fila-elegida .num {
+    color: var(--color-accent);
+    font-style: normal;
+    font-weight: 700;
+  }
+  .tabla-editorial tr.fila-elegida td:first-child {
+    box-shadow: inset 4px 0 0 var(--color-accent);
+    padding-inline-start: 1rem;
+  }
+  .tabla-editorial tr.fila-elegida h3 { font-weight: 700; }
+
+  /* -- Demo: capa propia en `DemoA.astro` (spread de dos páginas) --------- */
+
+  /* -- CTA: el único bloque con tinta sólida de toda la página ------------
+     La crítica a ciegas señaló que el acento se repartía en detalles tan
+     finos que dejaba de leerse como identidad y que la conversión no se
+     distinguía de "una sección de formulario más". Se resuelve igual, sin
+     tarjeta ni sombra: un filete se convierte en una plancha de tinta
+     completa — la página impresa en negativo — reservada a este único
+     momento, para que el punto de conversión sea inconfundible. */
+  .cta-panel {
+    background: var(--color-accent);
+    color: var(--color-paper);
+    border-color: var(--color-accent);
+  }
+  .cta-panel .eyebrow { color: var(--color-paper); opacity: 0.8; }
+  .cta-panel .eyebrow::after { background: var(--color-paper); }
+  .cta-panel h2 { color: var(--color-paper); }
+  .cta-panel .lead,
+  .cta-panel p,
+  .cta-panel .field label,
+  .cta-panel legend,
+  .cta-panel .radio {
+    color: var(--color-paper);
+  }
+  .cta-panel a:not(.btn) { color: var(--color-paper); text-decoration-color: var(--color-paper); }
+  .cta-panel a:not(.btn):hover { color: var(--color-paper); opacity: 0.85; }
+  .cta-panel :focus-visible { outline-color: var(--color-paper); }
+  .cta-panel .notice {
+    background: color-mix(in srgb, var(--color-paper) 16%, transparent);
+    border-color: var(--color-paper);
+    color: var(--color-paper);
+  }
+  .cta-panel .btn {
+    background: var(--color-paper);
+    color: var(--color-accent-strong);
+    border-color: var(--color-paper);
+  }
+  .cta-panel .btn:hover {
+    background: var(--color-paper-raised);
+    border-color: var(--color-paper-raised);
+  }
+  .cta-panel .done {
+    background: var(--color-paper-raised);
+    color: var(--color-ink);
+    border-color: var(--color-paper);
+  }
+  .cta-panel .err { color: #FFD2C9; }
+
+  /* -- FAQ: hereda la composición del control sin retoque de aquí --------- */
 }

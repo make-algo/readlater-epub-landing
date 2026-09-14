@@ -11,12 +11,15 @@ import Faq from '../../components/secciones/Faq.astro'
 import { hero } from '../../content/copy'
 
 /**
- * Variante A (MAK-99, Fase 4 de `launch-squad`) — "El objeto es el mensaje".
- * Mismo copy, mismo orden de siete secciones y mismo formulario que el
- * control (MAK-95); lo que cambia es el sistema visual, aplicado en toda la
- * página vía `global-a.css`, y la maqueta propia de héroe/demo/comparativa.
- * Cómo funciona, Privacidad, CTA y FAQ heredan la composición del control
- * sin modificación — solo cambian los tokens que ya usan.
+ * Variante C (MAK-123, Fase 4 ronda 2 de `launch-squad`) — "Revista
+ * editorial". Mismo copy, mismo orden de siete secciones y mismo formulario
+ * que el control (MAK-95); lo que cambia es la idea organizadora: la página
+ * se lee como la apertura de una revista impresa, no como pantallas de app.
+ * Retícula asimétrica de columnas en el héroe, filetes en vez de tarjetas,
+ * la demo como spread de doble página y la comparativa como tabla editorial
+ * — aplicado vía `global-a.css`. Cómo funciona, Privacidad, CTA y FAQ
+ * heredan la composición del control sin modificación; solo cambian los
+ * tokens que ya usan.
  */
 ---
 
@@ -24,13 +27,20 @@ import { hero } from '../../content/copy'
   <Header />
 
   <main id="contenido">
-    <section id="hero" class="wrap" style="padding-top: clamp(2.5rem, 6vw, 4.5rem);">
-      <p class="eyebrow">ReadLater EPUB</p>
-      <h1 style="margin-top: 1.25rem;">{hero.titular}</h1>
-      <p class="lead" style="margin-top: 1.25rem; font-style: italic;">{hero.subtitulo}</p>
-      <p style="margin-top: 1.75rem;">
-        <a class="btn-ghost" href="#lista-de-espera">{hero.cta}</a>
-      </p>
+    <section id="hero" class="wrap hero-masthead">
+      <div class="hero-masthead-meta">
+        <p class="eyebrow">ReadLater EPUB</p>
+        <p class="hero-marca" aria-hidden="true">Recordatorios<br />→ EPUB<br />→ Kindle</p>
+      </div>
+      <div class="hero-masthead-copy">
+        <h1>{hero.titular}</h1>
+      </div>
+      <div class="hero-masthead-support">
+        <p class="lead">{hero.subtitulo}</p>
+        <p style="margin-top: 1.5rem;">
+          <a class="btn-ghost" href="#lista-de-espera">{hero.cta}</a>
+        </p>
+      </div>
     </section>
 
     <DemoA />
