@@ -1,0 +1,251 @@
+/* ============================================================================
+   ReadLater EPUB — hoja de la variante B (Fase 4, MAK-100)
+   Deliberadamente NO importa `global.css` del control: es una hoja hermana,
+   independiente, para que tocar esta variante no vuelva a poner en revisión
+   el esqueleto compartido. Reproduce las mismas clases (`.wrap`, `.btn`,
+   `.banda`, `.field`…) que usan Header/Footer/Pasos/Privacidad/Cta/Faq, con
+   los valores de `tokens-b.css`, y añade las clases propias del tramo que sí
+   maqueta esta variante: héroe, demo y comparativa.
+   ========================================================================= */
+
+@import "tailwindcss";
+@import "./tokens-b.css";
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, p, ul, ol, li, figure, dl, dd { margin: 0; }
+  p { text-wrap: pretty; }
+
+  :focus-visible {
+    outline: var(--focus-width) solid var(--color-focus);
+    outline-offset: var(--focus-offset);
+    border-radius: inherit;
+  }
+
+  .skip {
+    position: absolute;
+    left: 1rem;
+    top: -3rem;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius);
+    transition: top 0.15s ease;
+    z-index: 50;
+  }
+  .skip:focus { top: 1rem; }
+}
+
+@layer components {
+  .wrap {
+    max-width: var(--wrap);
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+
+  section { padding-block: clamp(2.25rem, 5vw, 4.75rem); }
+
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+  }
+
+  h1 {
+    font-family: var(--font-serif);
+    font-size: var(--text-display);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+  }
+
+  h2 {
+    font-family: var(--font-serif);
+    font-size: var(--text-h2);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    color: var(--color-ink);
+  }
+
+  h3 {
+    font-family: var(--font-serif);
+    font-size: var(--text-h3);
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+
+  .lead {
+    font-size: 1.125rem;
+    color: var(--color-ink-2);
+    max-width: 46rem;
+  }
+
+  /* Botón de sistema: cápsula llena, como el botón por defecto de una hoja
+     de Ajustes de macOS — nunca el rectángulo de esquina apenas redondeada
+     del control. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--color-accent);
+    color: #FFFFFF;
+    font-weight: 600;
+    padding: 0.8rem 1.75rem;
+    border-radius: 0.75rem; /* rectángulo continuo de macOS, no la cápsula de iOS: mismo sistema de radios que las tarjetas, no uno aparte */
+    text-decoration: none;
+    border: 1px solid var(--color-accent);
+    white-space: nowrap;
+    font-size: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
+  }
+  .btn:hover { background: var(--color-accent-strong); border-color: var(--color-accent-strong); }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  /* El CTA de la cabecera comparte franja con el nombre del producto en muy
+     poco ancho: sin esto, la cápsula se parte en dos líneas en móvil
+     estrecho — el estado feo que corresponde a `ux` cubrir. */
+  header .btn { padding: 0.55rem 1rem; font-size: 0.8125rem; }
+
+  a { color: var(--color-accent); }
+  a:hover { color: var(--color-accent-strong); }
+
+  /* La "banda" del control (Privacidad, CTA) se convierte aquí en la tarjeta
+     agrupada blanca de Ajustes: en desktop ya queda insertada porque `.wrap`
+     limita el ancho a `--wrap` y dentro de esa caja no hay más blanco que
+     la propia tarjeta; en pantallas estrechas, sin ese límite, el margen
+     que aísla la tarjeta del borde hay que darlo explícitamente o la tarjeta
+     se pega a los dos cantos y deja de leerse como tarjeta — precisamente
+     el estado "móvil estrecho" que corresponde a `ux` cubrir. */
+  .banda {
+    background: var(--color-paper-sunk);
+    margin-inline: 0.875rem;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03), 0 10px 30px -18px rgba(28, 28, 30, 0.35);
+  }
+  @media (min-width: 40rem) {
+    .banda { margin-inline: auto; }
+  }
+
+  .field label { display: block; font-weight: 600; margin-bottom: 0.35rem; }
+  .field input[type='email'],
+  .field textarea {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.6rem;
+    background: var(--color-paper-raised);
+    color: var(--color-ink);
+    font: inherit;
+  }
+  .field--bad input { border-color: var(--color-error); }
+  .err { display: block; color: var(--color-error); font-size: var(--text-small); min-height: 1.2em; }
+
+  .radios { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
+  .radio { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 400; }
+
+  .notice {
+    background: var(--color-accent-wash);
+    color: var(--color-accent-strong);
+    border: 1px solid var(--color-accent);
+    border-radius: 0.6rem;
+    padding: 0.6rem 0.85rem;
+    font-size: var(--text-small);
+  }
+
+  .alert {
+    background: #FCE8E6;
+    color: var(--color-error);
+    border: 1px solid var(--color-error);
+    border-radius: 0.6rem;
+    padding: 0.6rem 0.85rem;
+    font-size: var(--text-small);
+  }
+
+  .done { border: 1px solid var(--color-line); border-radius: 0.6rem; padding: 1rem 1.25rem; background: var(--color-paper-raised); }
+
+  .hp { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* ---- Propio de la variante: héroe, demo, comparativa ------------------
+     Un solo material, sin caja que lo contenga: la fila de Recordatorios
+     viviendo directamente sobre el lienzo de la página, sin ventana de
+     macOS ni tarjeta con sombra de por medio — eso ya es "mockup de SaaS
+     genérico". Lo que hace que esto sea de Recordatorios y no de cualquier
+     otra app es el detalle real que nadie más tiene: el enlace guardado
+     ahí se ve como un enlace enriquecido (título + dominio), no como una
+     tarea de texto suelto. */
+
+  .linkrow {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding-block: 0.95rem;
+  }
+  .linkrow + .linkrow { border-top: 1px solid var(--color-line); }
+  .linkrow__titulo { font-weight: 600; color: var(--color-ink); }
+  .linkrow__dominio { display: block; margin-top: 0.1rem; color: var(--color-ink-3); font-size: var(--text-small); }
+  .linkrow__check {
+    flex: none;
+    width: 1.35rem;
+    height: 1.35rem;
+    margin-top: 0.15rem;
+    margin-left: auto;
+  }
+
+  /* La misma fila, ya convertida: gana folio (número de página) y check, con
+     el mismo recurso tipográfico que un índice de libro impreso — o el de
+     Apple Books — de verdad: puntos guía entre el título y la página. Nadie
+     compite con esto porque nadie más está vendiendo "esto se convierte en
+     un libro". Reaparece en Demo con el mismo tipo de fila, para que se lea
+     como continuación del héroe y no como una segunda maqueta distinta. */
+  .indexrow {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding-block: 0.8rem;
+  }
+  .indexrow + .indexrow { border-top: 1px solid var(--color-line); }
+  .indexrow__check { flex: none; width: 1.05rem; height: 1.05rem; margin-bottom: -0.05rem; }
+  .indexrow__titulo { color: var(--color-ink); white-space: nowrap; }
+  .indexrow__leader {
+    flex: 1;
+    min-width: 1rem;
+    border-bottom: 1px dotted var(--color-border);
+    margin-bottom: 0.35em;
+  }
+  .indexrow__folio { color: var(--color-ink-3); font-size: var(--text-small); font-variant-numeric: tabular-nums; }
+
+  /* El "esto se convierte en esto": tres glifos en línea, monocromos a
+     propósito — ya hay color de sobra en las insignias de arriba. */
+  .conversion {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--color-ink-3);
+  }
+}

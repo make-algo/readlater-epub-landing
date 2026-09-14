@@ -6,15 +6,19 @@
  * de precio, ausencia de secretos, rutas que resuelven y placeholder de la
  * demo correctamente rotulado.
  *
- * De momento solo existe el control (`/`); cuando la Fase 4 publique `/a/` y
- * `/b/`, esas rutas se suman a RUTAS igual que hizo echo en MAK-82.
+ * MAK-100 (Fase 4, variante B) suma `/b/` a RUTAS: mismo copy, mismo orden,
+ * mismo formulario que el control, verificado sobre el HTML ya construido de
+ * esa ruta — la variante no se da por buena a ojo.
  *
  *   npm run build && npm run verificar
  */
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const RUTAS = [['control /', 'dist/index.html']]
+const RUTAS = [
+  ['control /', 'dist/index.html'],
+  ['variante B /b/', 'dist/b/index.html'],
+]
 
 const faltan = RUTAS.filter(([, f]) => !existsSync(f))
 if (faltan.length) {
@@ -173,7 +177,13 @@ else console.log(`ok  sin recursos de terceros (${paginas.length} páginas, ${ho
 
 // --- Rutas de todas las variantes publicadas. Solo existe el control por
 //     ahora (MAK-95 es Fase 3; la Fase 4 añade /a/ y /b/ a esta lista).
-const RUTAS_ESPERADAS = ['dist/index.html', 'dist/gracias/index.html', 'dist/privacidad/index.html', 'dist/404.html']
+const RUTAS_ESPERADAS = [
+  'dist/index.html',
+  'dist/b/index.html',
+  'dist/gracias/index.html',
+  'dist/privacidad/index.html',
+  'dist/404.html',
+]
 const rutasFaltantes = RUTAS_ESPERADAS.filter((r) => !existsSync(r))
 if (rutasFaltantes.length) fallos.push(`faltan rutas: ${rutasFaltantes.join(', ')}`)
 else console.log(`ok  rutas publicadas · ${RUTAS_ESPERADAS.join(', ')}`)
