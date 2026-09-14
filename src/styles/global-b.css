@@ -248,4 +248,78 @@
     gap: 0.6rem;
     color: var(--color-ink-3);
   }
+
+  /* ---- Compartido con el control y la variante A (MAK-104) --------------
+     Pasos/Privacidad/Cta/Faq no cambian entre rutas: estas reglas reproducen
+     las mismas de `base.css`, con los nombres de variable que ya usa esta
+     hoja — mismo criterio de composición, piel de la variante B. */
+  .secuencia {
+    list-style: none;
+    padding: 0;
+    margin-top: 3rem;
+    max-width: 38rem;
+  }
+  .secuencia li {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    padding-block: 1.5rem;
+    margin-inline-start: min(calc(var(--i, 0) * 2.5rem), 16vw);
+    border-block-end: 1px solid var(--color-line);
+  }
+  .secuencia li:last-child { border-block-end: none; }
+  .secuencia-marca {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    line-height: 1;
+    font-weight: 400;
+    color: var(--color-line);
+  }
+
+  .declaracion { padding-block: clamp(4.5rem, 10vw, 8.5rem); }
+  .declaracion-cuerpo {
+    margin-top: 2rem;
+    margin-inline-start: auto;
+    max-width: 30rem;
+    text-align: right;
+    border-inline-end: 3px solid var(--color-accent);
+    padding-inline-end: 1.75rem;
+  }
+  .declaracion-cuerpo .lead { margin-inline-start: auto; }
+  .declaracion-cuerpo h2 { font-size: clamp(2.25rem, 1.5rem + 3.2vw, 3.75rem); line-height: 1.05; }
+
+  .cta-panel {
+    display: grid;
+    gap: 2rem 3rem;
+    grid-template-columns: minmax(14rem, 1fr) minmax(18rem, 1.4fr);
+    align-items: start;
+    border: 2px solid var(--color-ink);
+    padding: clamp(2rem, 5vw, 3rem);
+  }
+  .cta-panel-copy h2 { margin-top: 0.75rem; }
+  @media (max-width: 40rem) {
+    .cta-panel { grid-template-columns: 1fr; }
+  }
+
+  .indice {
+    margin-top: 2.5rem;
+    columns: 18rem 2;
+    column-gap: 2.5rem;
+    max-width: 54rem;
+  }
+  .indice-entrada {
+    break-inside: avoid;
+    padding-block: 1.1rem;
+    border-block-start: 1px solid var(--color-line);
+  }
+  .indice-entrada:first-child { border-block-start: none; }
+  .indice dt { display: flex; align-items: baseline; gap: 0.6rem; }
+  .indice-num {
+    font-family: var(--font-serif);
+    font-size: 0.9375rem;
+    font-weight: 400;
+    color: var(--color-line);
+    line-height: 1.3;
+  }
 }
