@@ -41,8 +41,13 @@
   --font-serif: ui-monospace, "SF Mono", "JetBrains Mono", "Roboto Mono", Menlo, Consolas, monospace;
   --font-sans:  ui-monospace, "SF Mono", "JetBrains Mono", "Roboto Mono", Menlo, Consolas, monospace;
 
-  --text-display: clamp(1.75rem, 1rem + 3.2vw, 3.25rem);
-  --text-h2:      clamp(1.375rem, 1.1rem + 1.3vw, 2rem);
+  /* Escala H1/H2 (MAK-121) — la ficha técnica original abría el titular a
+     3.25rem frente a un h2 de 2rem (1.625x): la misma distancia moderada
+     que ya señalaba MAK-111 en el control. Al ser una sola familia
+     monoespaciada aquí el peso pesa menos como señal (ver global-b.css),
+     así que la escala tiene que cargar más del contraste. */
+  --text-display: clamp(2rem, 1.05rem + 4.4vw, 4.25rem);
+  --text-h2:      clamp(1.125rem, 1rem + 0.7vw, 1.5rem);
   --text-h3:      clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem);
   --text-body:    1.0625rem;
   --text-small:   0.9375rem;

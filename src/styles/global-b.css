@@ -82,6 +82,12 @@
 
   section { padding-block: clamp(2.75rem, 5.5vw, 5rem); }
 
+  /* Ritmo de scroll a escala de página (MAK-121) — mismo criterio que
+     base.css del control: Cómo funciona se comprime, Comparativa se
+     expande para funcionar como pausa antes de Privacidad. */
+  #como-funciona { padding-block: clamp(1.5rem, 3vw, 2.75rem); }
+  #comparativa { padding-block: clamp(3.5rem, 7.5vw, 6.25rem); }
+
   .eyebrow {
     font-family: var(--font-sans);
     font-size: 0.8125rem;
@@ -91,6 +97,14 @@
     color: var(--color-ink-3);
   }
 
+  /* H1/H2 (MAK-121) — con una sola familia monoespaciada para todo, el h1 y
+     el h2 solo se distinguían por una escala moderada (~1.6x-1.7x) y ambos
+     pesaban 700: el mismo defecto de "todo el texto negocia el mismo peso"
+     que señaló MAK-111 en el control, aquí sin ni siquiera el cambio de
+     familia serif/sans que ayuda en las otras rutas. El h2 baja a 400 (el
+     paso más ligero de la escala 400/600/800 que ya declara esta hoja) y
+     abre el tracking para leerse como etiqueta de ficha, no como un h1
+     pequeño. */
   h1 {
     font-family: var(--font-serif);
     font-size: var(--text-display);
@@ -103,8 +117,9 @@
   h2 {
     font-family: var(--font-serif);
     font-size: var(--text-h2);
-    font-weight: 700;
+    font-weight: 400;
     line-height: 1.2;
+    letter-spacing: 0.01em;
     color: var(--color-ink);
   }
 

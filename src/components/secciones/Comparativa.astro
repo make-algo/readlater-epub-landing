@@ -2,13 +2,12 @@
 import { comparativa } from '../../content/copy'
 
 /**
- * Control — la comparativa como cotejo, no como dos tarjetas gemelas: la
- * opción descartada se lee fragmentada (columna estrecha, tipografía de
- * sistema, cortada por una segunda línea corta) y la elegida se lee como
- * objeto encuadernado (columna ancha, lomo de acento a la izquierda,
- * titular a escala de libro). El eje es framing + escala, igual que
- * documenta docs/design/04-composicion-secciones-heredadas.md para el resto
- * de secciones heredadas — antes, aquí solo cambiaba el color de fondo.
+ * Control, ronda 3 (MAK-121) — la comparativa como corrección de
+ * manuscrito, no como cotejo de dos columnas (MAK-109/110): la opción
+ * descartada se tacha en línea, dentro de la misma frase, y la respuesta la
+ * corrige justo a continuación — una sola frase que fluye como prosa, no
+ * dos bloques uno junto al otro. Ver docs/design/04-composicion-secciones-
+ * heredadas.md para la prueba de scroll que justifica el cambio.
  */
 ---
 
@@ -16,16 +15,10 @@ import { comparativa } from '../../content/copy'
   <p class="eyebrow">Comparativa</p>
   <h2>{comparativa.nombre}</h2>
 
-  <div class="cotejo">
-    <div class="cotejo-perdida" data-fila-comparativa>
-      <h3>{comparativa.sendToKindle.titulo}</h3>
-      <p>{comparativa.sendToKindle.texto}</p>
-    </div>
-    <div class="cotejo-ganada" data-fila-comparativa>
-      <h3>{comparativa.readlater.titulo}</h3>
-      <p>{comparativa.readlater.texto}</p>
-    </div>
-  </div>
+  <p class="correccion">
+    <span class="correccion-fuera"><del>{comparativa.sendToKindle.titulo}</del>: {comparativa.sendToKindle.texto}</span>
+    <span class="correccion-dentro"><ins>{comparativa.readlater.titulo}</ins>: {comparativa.readlater.texto}</span>
+  </p>
 
   <p class="lead" style="margin-top: 1.5rem;">{comparativa.otros}</p>
 </section>
