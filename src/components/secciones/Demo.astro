@@ -503,15 +503,26 @@ const skeletonHtml = `<div class="skeleton">
       const h = document.createElement('h4')
       h.textContent = label
       viewport.appendChild(h)
-      book.load(href).then((doc: Document) => {
-        const body = doc.querySelector('body')
-        if (!body) return
-        body.querySelectorAll('p').forEach((p) => {
-          const clone = document.createElement('p')
-          clone.textContent = p.textContent
-          viewport.appendChild(clone)
+      book
+        .load(href)
+        .then((doc: Document) => {
+          const body = doc.querySelector('body')
+          if (!body) return
+          body.querySelectorAll('p').forEach((p) => {
+            const clone = document.createElement('p')
+            clone.textContent = p.textContent
+            viewport.appendChild(clone)
+          })
         })
-      })
+        .catch((err: unknown) => {
+          // Sin esto, un capítulo que falla a media lectura deja el
+          // viewport vacío tras el título — indistinguible de un bug
+          // (hallazgo de revisión, MAK-101).
+          const p = document.createElement('p')
+          p.textContent = demoCopy.lectorError
+          viewport.appendChild(p)
+          console.error('epub.js chapter load failed', err)
+        })
     }
 
     function showEpubError(container: HTMLElement) {
