@@ -10,6 +10,11 @@
  * mismo formulario que el control, verificado sobre el HTML ya construido de
  * esa ruta — la variante no se da por buena a ojo.
  *
+ * MAK-112 porta la demo real (MAK-101) a las variantes A y B: el check de
+ * jszip-antes-que-epub.min.js/openFailed pasa a leer la fuente de los tres
+ * componentes de Demo en vez del bundle de `dist/`, porque compartir
+ * `src/lib/demo.ts` entre tres componentes lo separa en un chunk propio.
+ *
  *   npm run build && npm run verificar
  */
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
@@ -68,7 +73,7 @@ const INNEGOCIABLES = [
   ['FAQ · precio', '¿Cuánto cuesta?'],
   ['FAQ · precio, respuesta', 'Aún no lo hemos fijado; quien entra en la lista de espera lo sabrá antes que nadie.'],
   ['FAQ · descarga', '¿Cuándo hay descarga?'],
-  ['rótulo del placeholder de la demo', 'Vista previa en lector de escritorio — pendiente sustituir por fotografía de Kindle real'],
+  ['demo · nota de contenido de ejemplo', 'El EPUB de la derecha usa un fichero de ejemplo con contenido de relleno'],
 ]
 
 // El orden en que el argumento tiene que leerse, sección a sección.
@@ -114,10 +119,13 @@ for (const [ruta, fichero] of RUTAS) {
   for (const opcion of ['Sí', 'No', 'Tengo otro e-reader'])
     if (!texto.includes(opcion)) mal(ruta, `falta la opción «${opcion}» de la pregunta Kindle`)
 
-  if (!/data-placeholder="kindle-real-pendiente"/.test(html))
-    mal(ruta, 'la imagen de la demo no lleva el marcador data-placeholder="kindle-real-pendiente"')
-
   if (!/name="_gotcha"/.test(html)) mal(ruta, 'el honeypot del formulario no se llama _gotcha')
+
+  // --- Demo embebida (MAK-101): split-screen accesible con fallback a tabs en móvil.
+  if (!/role="tablist"/.test(html) || !/role="tab"/.test(html) || !/role="tabpanel"/.test(html))
+    mal(ruta, 'la demo no lleva los roles tablist/tab/tabpanel del breakpoint móvil')
+  if (!texto.includes('Web') || !texto.includes('Kindle'))
+    mal(ruta, 'faltan las etiquetas de tab «Web» / «Kindle» de la demo')
 
   const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? ''
   const description = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? ''
@@ -175,6 +183,42 @@ for (const f of [...paginas, ...hojas]) {
 }
 if (terceros.length) fallos.push(`recursos de dominios ajenos: ${terceros.join(', ')}`)
 else console.log(`ok  sin recursos de terceros (${paginas.length} páginas, ${hojas.length} hojas de estilo)`)
+
+// --- Demo embebida (MAK-101, portada a las variantes en MAK-112): el EPUB
+//     de prueba se publica y las tres variantes cargan jszip ANTES que
+//     epub.min.js (si no, book.open() se cuelga sin error — ver
+//     docs/design/02-demo-embebida.md en readlater-epub) y escuchan
+//     'openFailed' además de la resolución de book.loaded.navigation.
+//
+//     Se comprueba en la FUENTE de cada componente de Demo, no en el bundle
+//     de `dist/`: desde que las tres variantes comparten `src/lib/demo.ts`,
+//     Vite lo separa en un chunk propio y el orden textual de las cadenas
+//     "jszip"/"epubjs" dentro de un bundle ya no refleja el orden real en
+//     que el código los carga.
+if (!existsSync('dist/demo/demo-epub-placeholder.epub'))
+  fallos.push('falta dist/demo/demo-epub-placeholder.epub (el EPUB de prueba de la demo)')
+else console.log('ok  demo · EPUB de prueba publicado en dist/demo/')
+
+const DEMO_COMPONENTES = [
+  'src/components/secciones/Demo.astro',
+  'src/components/secciones/DemoA.astro',
+  'src/components/secciones/b/Demo.astro',
+]
+const erroresPrevios = fallos.length
+for (const ruta of DEMO_COMPONENTES) {
+  if (!existsSync(ruta)) {
+    fallos.push(`${ruta}: no existe`)
+    continue
+  }
+  const fuente = readFileSync(ruta, 'utf8')
+  const posJszip = fuente.indexOf('loadScript(DEMO_JSZIP_SRC)')
+  const posEpubjs = fuente.indexOf('loadScript(DEMO_EPUBJS_SRC)')
+  if (posJszip < 0 || posEpubjs < 0 || posJszip > posEpubjs)
+    fallos.push(`${ruta}: jszip no se carga antes que epub.min.js`)
+  if (!fuente.includes('openFailed')) fallos.push(`${ruta}: no escucha el evento openFailed de epub.js`)
+}
+if (fallos.length === erroresPrevios)
+  console.log('ok  demo · las tres variantes cargan jszip antes que epub.min.js y escuchan openFailed')
 
 // --- Rutas de todas las variantes publicadas. Solo existe el control por
 //     ahora (MAK-95 es Fase 3; la Fase 4 añade /a/ y /b/ a esta lista).

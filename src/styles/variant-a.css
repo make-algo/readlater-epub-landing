@@ -148,58 +148,7 @@
   input[type='radio'] { accent-color: var(--color-ink); }
   .field input[type='email'] { border-radius: 0; }
 
-  /* -- Demo: el libro abierto es la pieza, no una imagen de blog ---------
-     Es lo que demuestra la promesa entera del producto, así que ocupa más
-     que el resto de bloques de la página, rompe el centrado del resto de
-     secciones desplazándose al borde izquierdo de `.wrap`, y se apoya en
-     una sombra de objeto real — un libro sobre la mesa, no una tarjeta. */
-  .spread {
-    margin-top: 2.75rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-    max-width: 58rem;
-    margin-inline-end: auto;
-    box-shadow: 0 28px 46px -22px rgb(23 20 13 / 0.38);
-  }
-  .spread > figure {
-    margin: 0;
-    background: var(--color-paper-raised);
-    border: 1px solid var(--color-line);
-    padding: 1.5rem 1.5rem 1.25rem;
-  }
-  .spread > figure:first-child {
-    border-right: none;
-    border-radius: 2px 0 0 2px;
-    box-shadow: inset -10px 0 14px -12px rgb(0 0 0 / 0.35);
-  }
-  .spread > figure:last-child {
-    border-radius: 0 2px 2px 0;
-    box-shadow: inset 10px 0 14px -12px rgb(0 0 0 / 0.35);
-  }
-  .spread img { width: 100%; height: auto; display: block; }
-  .spread-caption {
-    margin-top: 0.75rem;
-    max-width: 58rem;
-    text-align: right;
-    color: var(--color-ink-3);
-    font-size: 0.8125rem;
-    font-style: italic;
-    opacity: 0.85;
-  }
-  @media (max-width: 47.9375rem) {
-    .spread {
-      grid-template-columns: 1fr;
-      gap: 1.25rem;
-      box-shadow: 0 20px 32px -20px rgb(23 20 13 / 0.35);
-    }
-    .spread > figure:first-child,
-    .spread > figure:last-child {
-      border: 1px solid var(--color-line);
-      border-radius: 2px;
-      box-shadow: inset 0 -10px 14px -12px rgb(0 0 0 / 0.35);
-    }
-  }
+  /* -- Demo: estilos propios en `DemoA.astro` (MAK-112) ------------------- */
 
   /* -- Comparativa: notas al margen, no tarjetas -------------------------- */
   .marginalia {
