@@ -1,11 +1,24 @@
 ---
 import { url } from '../lib/site'
+
+/**
+ * Marca — serif para el nombre de lectura + etiqueta de sistema para el
+ * formato, separadas por un filete (00-identidad-visual.md: "un filete de
+ * 1-2px, como el lomo que separa dos páginas de un libro"). Antes era un
+ * icono genérico + texto en negrita, indistinguible de cualquier cabecera
+ * de SaaS. El CTA de nav pasa a `.btn-ghost`: es refuerzo, no la conversión
+ * — esa vive en la sección CTA (`Cta.astro` → `WaitlistForm`), único sitio
+ * con `.btn` sólido.
+ */
 ---
 
-<header class="wrap" style="padding-block: 1.25rem; display: flex; align-items: center; justify-content: space-between;">
-  <a href={url('/')} style="display:flex; align-items:center; gap:0.5rem; text-decoration:none; color: var(--color-ink); font-weight:700;">
-    <img src={url('/favicon.svg')} alt="" width="24" height="24" />
-    ReadLater EPUB
+<header class="wrap site-header">
+  <a href={url('/')} class="marca">
+    <img src={url('/favicon.svg')} alt="" width="22" height="22" />
+    <span class="marca-texto">
+      ReadLater
+      <span class="marca-formato">EPUB</span>
+    </span>
   </a>
-  <a class="btn" href="#lista-de-espera">Entra en la lista de espera</a>
+  <a class="btn-ghost" href="#lista-de-espera">Entra en la lista de espera</a>
 </header>
