@@ -14,7 +14,10 @@
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const RUTAS = [['control /', 'dist/index.html']]
+const RUTAS = [
+  ['control /', 'dist/index.html'],
+  ['variante A /a/', 'dist/a/index.html'],
+]
 
 const faltan = RUTAS.filter(([, f]) => !existsSync(f))
 if (faltan.length) {
