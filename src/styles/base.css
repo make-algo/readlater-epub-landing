@@ -62,6 +62,18 @@
 
   section { padding-block: clamp(3rem, 6vw, 5.5rem); }
 
+  /* Ritmo de scroll a escala de página (MAK-121) — con el mismo compás en
+     las siete secciones, el conjunto lee como un metrónomo aunque cada
+     retícula interna sea distinta (ver 04-composicion-secciones-heredadas.md,
+     ronda de control MAK-111). Dos secciones rompen el compás uniforme:
+     Cómo funciona se comprime (es una secuencia rápida de tres pasos, no
+     necesita respirar) y Comparativa se expande (ahora es una única frase
+     corregida a escala de declaración — necesita el mismo tipo de pausa que
+     ya tenía Privacidad, justo antes de llegar a ella). El resto conserva el
+     compás por defecto. */
+  #como-funciona { padding-block: clamp(2rem, 3.6vw, 3.25rem); }
+  #comparativa { padding-block: clamp(4.5rem, 9vw, 7.5rem); }
+
   .eyebrow {
     font-family: var(--font-sans);
     font-size: 0.8125rem;
@@ -71,18 +83,27 @@
     color: var(--color-ink-3);
   }
 
+  /* H1 de héroe vs. H2 de sección (MAK-121) — antes ambos negociaban el
+     mismo peso y solo variaban en escala moderada (~1.6x en el punto más
+     ancho). Ahora el h1 es más grande (~1.9x-3.25x el h2 según viewport,
+     ver tokens.css) y además pesa más y cierra el tracking; el h2 se aligera
+     y abre el tracking para leerse como subtítulo de sección, no como un h1
+     pequeño. Solo tipografía — cero tokens de color nuevos. */
   h1 {
     font-family: var(--font-serif);
     font-size: var(--text-display);
-    line-height: 1.1;
-    letter-spacing: -0.01em;
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
     color: var(--color-ink);
   }
 
   h2 {
     font-family: var(--font-serif);
     font-size: var(--text-h2);
-    line-height: 1.2;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
     color: var(--color-ink);
   }
 
@@ -256,48 +277,52 @@
   .declaracion-cuerpo .lead { margin-inline-start: auto; }
   .declaracion-cuerpo h2 { font-size: clamp(2.25rem, 1.5rem + 3.2vw, 3.75rem); line-height: 1.05; }
 
-  /* Comparativa (control) — cotejo, no dos tarjetas gemelas: la opción
-     descartada se lee fragmentada (columna estrecha, tipografía de sistema,
-     segunda línea corta que la corta en dos) y la elegida se lee como objeto
-     encuadernado (columna ancha, lomo de acento, titular a escala de libro).
-     Eje: framing + escala — ComparativaA varía por marca (marginalia) y la
-     variante B por lista de verificación (linkrow); esta no repite ninguno. */
-  .cotejo {
+  /* Comparativa (control, ronda 3 — MAK-121) — corrección de manuscrito, no
+     cotejo de dos columnas: MAK-109/110 ya cambiaron el relleno del cotejo
+     pero seguía siendo la misma retícula que cualquier tabla de comparación
+     SaaS (dos bloques, uno al lado o debajo del otro, "pierde" vs "gana").
+     Aquí la duda y la respuesta viven en la MISMA frase que fluye como
+     prosa — se tacha la opción descartada en línea y se corrige justo a
+     continuación, como la corrección de un editor sobre el propio texto.
+     No hay bloques discretos que comparar: solo una frase que crece hacia
+     la derecha y se envuelve, un eje de crecimiento que ninguna otra
+     sección de la página usa (Cómo funciona crece en indentación
+     progresiva, Privacidad se alinea al margen, CTA lleva marco completo).
+     Ver la prueba de scroll en 04-composicion-secciones-heredadas.md. */
+  .correccion {
     margin-top: 2.5rem;
-    display: grid;
-    grid-template-columns: minmax(0, 0.62fr) minmax(0, 1fr);
-    gap: 1rem 2.5rem;
-    align-items: start;
+    max-width: 40rem;
+    font-family: var(--font-serif);
   }
-  @media (max-width: 40rem) {
-    .cotejo { grid-template-columns: 1fr; gap: 2rem; }
-  }
-  .cotejo-perdida {
-    padding-block-start: 0.35rem;
-    border-block-start: 1px solid var(--color-line);
-  }
-  .cotejo-perdida::after {
-    content: '';
+  /* La duda es un apunte al vuelo: pequeño, apagado, solo el nombre lleva
+     la marca de tachado — no la frase entera, que es lo que la ronda de
+     crítica leyó como "un diff de wiki". La respuesta es la que se queda
+     con el peso y la escala de la sección. */
+  .correccion-fuera {
     display: block;
-    width: 55%;
-    height: 1px;
-    margin-block-start: 1rem;
-    background: var(--color-line);
+    font-size: 1.125rem;
+    font-style: italic;
+    color: var(--color-ink-2);
   }
-  .cotejo-perdida h3 {
-    font-family: var(--font-sans);
-    font-size: var(--text-small);
+  .correccion-fuera del {
+    text-decoration: line-through;
+    text-decoration-color: var(--color-ink-3);
+    text-decoration-thickness: 1.5px;
+  }
+  .correccion-dentro {
+    display: block;
+    margin-top: 0.6rem;
+    font-size: clamp(1.375rem, 1.1rem + 1.2vw, 1.875rem);
+    line-height: 1.4;
+    color: var(--color-ink);
+  }
+  .correccion-dentro ins {
     font-weight: 600;
-    color: var(--color-ink-3);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
   }
-  .cotejo-perdida p { margin-top: 0.5rem; font-size: var(--text-small); color: var(--color-ink-2); }
-  .cotejo-ganada {
-    border-inline-start: 3px solid var(--color-accent);
-    padding-inline-start: 1.75rem;
-    padding-block-start: 0.1rem;
-  }
-  .cotejo-ganada h3 { font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem); }
-  .cotejo-ganada p { margin-top: 0.6rem; color: var(--color-ink-2); }
 
   /* CTA — panel encuadrado de dos columnas: el único momento de la página
      con un marco completo (filete `--ink`, "aquí empieza un bloque nuevo"

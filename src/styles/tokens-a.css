@@ -31,8 +31,12 @@
   --font-serif: Charter, "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
   --font-sans:  -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
 
-  --text-display: clamp(2.25rem, 1.35rem + 3.6vw, 3.75rem);
-  --text-h2:      clamp(1.375rem, 1.1rem + 1.4vw, 2.125rem);
+  /* Escala H1/H2 (MAK-121) — 3.75rem frente a 2.125rem es solo 1.67x, la
+     misma distancia moderada que señaló MAK-111 en el control. El peso ya
+     lo distingue `base.css` (h1 600, h2 400, compartido con esta variante
+     vía `global-a.css`); aquí se abre además la escala. */
+  --text-display: clamp(2.5rem, 1.3rem + 5vw, 4.75rem);
+  --text-h2:      clamp(1.25rem, 1.1rem + 0.8vw, 1.625rem);
   --text-h3:      clamp(1.125rem, 1rem + 0.6vw, 1.375rem);
   --text-body:    1.0625rem;
   --text-small:   0.9375rem;
