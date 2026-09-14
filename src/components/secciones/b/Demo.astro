@@ -2,12 +2,13 @@
 import { demo } from '../../../content/copy'
 
 /**
- * Variante B — misma demo real que el control (epub.js, tres estados, tabs
- * accesibles en móvil; MAK-101), con la piel "Ya lo conoces": tarjeta
- * agrupada blanca sobre el lienzo gris de sistema, acento azul de sistema,
- * cabeceras redondeadas — los mismos tokens de `tokens-b.css` que ya usa el
- * resto de esta variante. Comportamiento compartido con el control, sin
- * tocar (`src/lib/demo.ts`).
+ * Variante D — misma demo real que el control (epub.js, tres estados, tabs
+ * accesibles en móvil; MAK-101), con la piel "Ficha técnica / dossier"
+ * (Fase 4 ronda 2, MAK-124): el split-screen se lee como un diagrama
+ * anotado de proceso — ENTRADA / SALIDA junto a cada columna, referencias
+ * tipo cota de plano, hairlines rectas — no como un mockup de dispositivo
+ * flotando. Reemplaza la piel de la variante B de la ronda 1 (MAK-100).
+ * Comportamiento compartido con el control, sin tocar (`src/lib/demo.ts`).
  */
 
 const skeletonHtml = `<div class="skeleton">
@@ -23,6 +24,11 @@ const skeletonHtml = `<div class="skeleton">
 ---
 
 <section id="demo" class="wrap demo-seccion" aria-label="Demostración interactiva: web original frente a EPUB generado">
+  <div class="ficha-doc__bar">
+    <span class="ficha-doc__id">Ficha 02 — Transformación</span>
+    <span>Diagrama de proceso</span>
+  </div>
+
   <p class="eyebrow">Demo</p>
   <h2>{demo.nombre}</h2>
   <p class="lead" style="margin-top: 0.75rem;">{demo.intro}</p>
@@ -30,13 +36,19 @@ const skeletonHtml = `<div class="skeleton">
   <!-- ===== Escritorio / tablet: split-screen ===== -->
   <div class="demo-frame demo-grid" data-view="split">
     <div class="col">
-      <div class="col-label"><span>{demo.colWeb}</span><span class="src">paulgraham.com</span></div>
+      <div class="col-label">
+        <span><span class="reftag">A · Entrada</span>{demo.colWeb}</span>
+        <span class="src">paulgraham.com</span>
+      </div>
       <div class="col-body" data-slot="web">
         <div class="demo-state demo-state--loading" data-role="loading" set:html={skeletonHtml} />
       </div>
     </div>
     <div class="col">
-      <div class="col-label"><span>{demo.colEpub}</span><span class="src">{demo.colEpubFuente}</span></div>
+      <div class="col-label">
+        <span><span class="reftag">B · Salida</span>{demo.colEpub}</span>
+        <span class="src">{demo.colEpubFuente}</span>
+      </div>
       <div class="col-body" data-slot="epub">
         <div class="demo-state demo-state--loading" data-role="loading" set:html={skeletonHtml} />
       </div>
@@ -70,7 +82,8 @@ const skeletonHtml = `<div class="skeleton">
    * marcado (skeleton, iframe, lector EPUB, panel de índice) lo crea el
    * `<script>` de más abajo en el cliente. Los tokens locales apuntan a los
    * de `tokens-b.css` — sin paleta propia de esta sección, para que cambie
-   * de piel con el resto de la variante sin tocar una línea aquí.
+   * de piel con el resto de la variante sin tocar una línea aquí. Sin radio
+   * de esquina, sin sombra: hairlines rectas, como el resto de la ficha.
    */
   .demo-seccion {
     --demo-paper: var(--color-paper-raised);
@@ -80,7 +93,7 @@ const skeletonHtml = `<div class="skeleton">
     --demo-line: var(--color-line);
     --demo-accent: var(--color-accent);
     --demo-flag: var(--color-accent-strong);
-    --demo-radius: var(--radius);
+    --demo-radius: 0;
     --demo-height: min(72vh, 640px);
   }
 
@@ -112,9 +125,8 @@ const skeletonHtml = `<div class="skeleton">
   .col-label {
     font-family: var(--font-sans);
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.01em;
-    text-transform: uppercase;
     color: var(--demo-ink-soft);
     padding: 0.625rem 1rem;
     border-bottom: 1px solid var(--demo-line);
@@ -122,9 +134,19 @@ const skeletonHtml = `<div class="skeleton">
     justify-content: space-between;
     gap: 0.5rem;
   }
+  .col-label .reftag {
+    display: block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--demo-ink-soft);
+    margin-bottom: 0.2rem;
+  }
   .col-label .src {
     color: var(--demo-ink);
-    font-weight: 600;
+    font-weight: 700;
+    text-align: right;
   }
 
   .col-body {
@@ -168,7 +190,6 @@ const skeletonHtml = `<div class="skeleton">
   .sk-line {
     height: 12px;
     margin-bottom: 12px;
-    border-radius: 4px;
     background: linear-gradient(90deg, var(--demo-paper-dim), var(--demo-line), var(--demo-paper-dim));
     background-size: 200% 100%;
     animation: demo-sk-pulse 1.6s ease-in-out infinite;
@@ -201,7 +222,7 @@ const skeletonHtml = `<div class="skeleton">
     display: block;
     width: 100%;
     height: auto;
-    filter: grayscale(0.15);
+    filter: grayscale(0.3);
   }
   .fallback-flag {
     position: sticky;
@@ -239,7 +260,7 @@ const skeletonHtml = `<div class="skeleton">
   .toc h3 {
     font-family: var(--font-sans);
     font-size: 0.6875rem;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--demo-ink-soft);
@@ -264,7 +285,7 @@ const skeletonHtml = `<div class="skeleton">
   .toc li a[aria-current='true'] {
     border-left-color: var(--demo-accent);
     background: var(--demo-paper-dim);
-    font-weight: 600;
+    font-weight: 700;
   }
   .reader-viewport {
     flex: 1 1 auto;
@@ -274,7 +295,7 @@ const skeletonHtml = `<div class="skeleton">
   }
   .reader-viewport h4 {
     font-family: var(--font-serif);
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     margin: 0 0 0.25rem;
     color: var(--demo-ink);
   }
@@ -317,7 +338,7 @@ const skeletonHtml = `<div class="skeleton">
       flex: 1 1 50%;
       font-family: var(--font-sans);
       font-size: 0.8125rem;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: 0.01em;
       text-transform: uppercase;
       background: var(--demo-paper);
@@ -375,7 +396,7 @@ const skeletonHtml = `<div class="skeleton">
     const webSlotM = section.querySelector<HTMLElement>('[data-slot="web-m"]')
     const epubSlotM = section.querySelector<HTMLElement>('[data-slot="epub-m"]')
 
-    // ---- carga en diferido de epub.js: solo cuando la demo se acerca al viewport ----
+    // ---- carga en diferido de epub.js: solo cuando la demo entra en viewport ----
     let scriptsPromise: Promise<void> | null = null
     function loadScript(src: string): Promise<void> {
       return new Promise((resolve, reject) => {

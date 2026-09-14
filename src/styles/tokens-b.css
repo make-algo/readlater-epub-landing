@@ -1,54 +1,56 @@
 /* ============================================================================
-   ReadLater EPUB — tokens de la variante B, "Ya lo conoces" (Fase 4, MAK-100)
-   Material: la lista con check de Recordatorios y la superficie agrupada de
-   Ajustes/Notas en macOS — lienzo gris de sistema, tarjetas blancas insertadas,
-   acento azul de sistema, cabeceras en SF Pro Rounded. Mismos nombres de
-   variable que `tokens.css` del control: así todo lo que ya usa `var(--color-*)`
-   en los componentes compartidos (Header, Footer, Pasos, Privacidad, Cta, Faq)
-   cambia de piel sin que se toque una sola línea de esos ficheros.
+   ReadLater EPUB — tokens de la variante D, "Ficha técnica / dossier"
+   (Fase 4 ronda 2 de `launch-squad`, MAK-124). Sigue publicándose en `/b/`,
+   reemplazando el contenido de la variante B de la ronda 1 (MAK-100, descartada).
 
-   Contraste verificado (WCAG AA, 4.5:1 texto / 3:1 UI) con los pares reales
-   que se usan en esta página — no son los valores "de catálogo" de Apple sin
-   más: se han oscurecido donde hacía falta para pasar el umbral.
+   Material: no una superficie (papel, cristal, tarjeta), sino una retícula —
+   la hoja de especificaciones y el plano técnico. Consecuencia directa en los
+   tokens: una sola familia tipográfica (monoespaciada, a propósito — el
+   contraste se construye por peso y tamaño, no cambiando de fuente), cero
+   radio de esquina en todo el sistema, y un único color de "estado" que
+   nunca rellena una superficie, solo marca una franja o un carácter.
+
+   Mismos nombres de variable que `tokens.css` del control: así todo lo que
+   ya usa `var(--color-*)` en los componentes compartidos (Header, Footer,
+   Pasos, Privacidad, Cta, Faq) cambia de piel sin tocar una línea de esos
+   ficheros — ver `launch-squad`, Fase 4.
    ========================================================================= */
 
 @theme {
-  --color-paper:        #F2F2F7; /* lienzo — systemGroupedBackground        */
-  --color-paper-sunk:   #FFFFFF; /* tarjeta agrupada (banda: CTA, Privacidad) */
-  --color-paper-raised: #FFFFFF; /* superficie de la demo                    */
+  --color-paper:        #F4F2EA; /* papel de calco, no papel cálido de libro  */
+  --color-paper-sunk:   #FFFFFF; /* módulo insertado (banda: CTA, Privacidad) */
+  --color-paper-raised: #FFFFFF; /* lienzo de la demo                        */
 
-  --color-ink:          #1C1C1E; /* label — texto principal                  */
-  --color-ink-2:        #3C3C43; /* secondaryLabel — texto de apoyo          */
-  --color-ink-3:        #6E6E73; /* tertiaryLabel — eyebrow, pies de foto    */
+  --color-ink:          #17160F; /* texto principal, tinta técnica casi negra */
+  --color-ink-2:        #4C4A3B; /* texto secundario                         */
+  --color-ink-3:        #726D58; /* etiquetas, folios, anotaciones           */
 
-  --color-line:         #D1D1D6; /* separator — divisorias de fila           */
-  --color-border:       #8A8A8E; /* borde de campo de formulario (3:1 en blanco) */
+  --color-line:         #A9A186; /* hairline — estructura visible, no adorno */
+  --color-border:       #6B6650; /* borde de control de formulario (AA)      */
 
-  --color-accent:       #0066CC; /* systemBlue oscurecido para AA en texto   */
-  --color-accent-strong:#0051D5; /* hover / active                           */
-  --color-accent-wash:  #E5F1FF; /* fondo de fila seleccionada                */
+  --color-accent:       #A5371C; /* rojo de sello/anotación — color de estado */
+  --color-accent-strong:#7C2A15; /* hover / active                            */
+  --color-accent-wash:  #F1E0D8; /* fondo de fila destacada, sin ser tarjeta   */
 
-  --color-check:        #248A3D; /* systemGreen oscurecido — check de lista  */
-  --color-error:        #D70015; /* systemRed oscurecido para AA en texto    */
+  --color-check:        #4B6F1F; /* verde apagado — solo para el glifo ✓      */
+  --color-error:        #A5371C;
 
-  /* SF Pro Rounded vía la palabra clave genérica `ui-rounded`: en macOS/iOS
-     Safari la resuelve a la tipografía real del sistema (la misma de los
-     títulos grandes de Recordatorios) sin cargar ningún activo; en el resto
-     cae a system-ui. Se asigna a `--font-serif` — el nombre que ya usan
-     h1/h2/h3 en `global.css` — para no tocar ese fichero. */
-  --font-serif: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif;
-  --font-sans:  -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+  /* Una sola familia, monoespaciada, para titulares y cuerpo: la tipografía
+     de una hoja de especificaciones impresa, no la de una app. El contraste
+     lo hace el peso (400/600/800) y el tamaño, nunca un cambio de fuente. */
+  --font-serif: ui-monospace, "SF Mono", "JetBrains Mono", "Roboto Mono", Menlo, Consolas, monospace;
+  --font-sans:  ui-monospace, "SF Mono", "JetBrains Mono", "Roboto Mono", Menlo, Consolas, monospace;
 
-  --text-display: clamp(1.75rem, 1rem + 3.4vw, 3.75rem);
-  --text-h2:      clamp(1.5rem, 1.15rem + 1.6vw, 2.25rem);
-  --text-h3:      clamp(1.125rem, 1rem + 0.6vw, 1.375rem);
+  --text-display: clamp(1.75rem, 1rem + 3.2vw, 3.25rem);
+  --text-h2:      clamp(1.375rem, 1.1rem + 1.3vw, 2rem);
+  --text-h3:      clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem);
   --text-body:    1.0625rem;
   --text-small:   0.9375rem;
 
   --wrap: 68rem;
-  --radius: 1rem; /* la tarjeta agrupada, no la esquina apenas biselada del control */
+  --radius: 0; /* nada de esquinas redondeadas: bordes rectos, divisiones explícitas */
 
   --focus-width: 3px;
   --focus-offset: 2px;
-  --color-focus: #0066CC;
+  --color-focus: #17160F;
 }
