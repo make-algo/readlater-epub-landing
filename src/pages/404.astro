@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import { url } from '../lib/site'
+---
+
+<Base title="Página no encontrada — ReadLater EPUB" path="/404">
+  <Header />
+  <main id="contenido" class="wrap" style="padding-block: 4rem;">
+    <h1 style="font-size: var(--text-h2);">Página no encontrada.</h1>
+    <p class="lead" style="margin-top: 1rem;"><a href={url('/')}>Volver a la landing</a></p>
+  </main>
+  <Footer />
+</Base>

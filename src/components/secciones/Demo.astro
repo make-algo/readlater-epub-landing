@@ -1,0 +1,35 @@
+---
+import { url } from '../../lib/site'
+import { demo } from '../../content/copy'
+
+/**
+ * Sección 2 — Demo. Placeholder rotulado (mínimo viable): todavía no existe
+ * ni la fotografía de un Kindle real (MAK-91) ni el EPUB de prueba versionado
+ * que necesita la demo split-screen completa de
+ * `docs/product/01-demo-embebida-landing.md` (MAK-93/94). Se documenta aquí
+ * como bloqueo, tal y como pide `00-alcance-landing-v1.md`: la sección no se
+ * da por cerrada, ni la landing sale de `noindex`, hasta que se sustituya por
+ * la fotografía real o la demo interactiva.
+ */
+---
+
+<section id="demo" class="wrap">
+  <p class="eyebrow">Demo</p>
+  <h2>{demo.nombre}</h2>
+  <p class="lead" style="margin-top: 0.75rem;">{demo.intro}</p>
+
+  <figure style="margin-top: 2rem; max-width: 40rem;">
+    <img
+      src={url('/demo/indice-placeholder.svg')}
+      alt={demo.indiceAlt}
+      width="640"
+      height="420"
+      loading="lazy"
+      data-placeholder={demo.placeholderId}
+      style="width: 100%; height: auto; border-radius: var(--radius);"
+    />
+    <figcaption style="margin-top: 0.6rem; color: var(--color-ink-3); font-size: var(--text-small);">
+      {demo.rotulo}
+    </figcaption>
+  </figure>
+</section>

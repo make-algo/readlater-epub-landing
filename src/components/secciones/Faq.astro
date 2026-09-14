@@ -1,0 +1,26 @@
+---
+import { url } from '../../lib/site'
+import { faq } from '../../content/copy'
+---
+
+<section id="faq" class="wrap">
+  <p class="eyebrow">FAQ</p>
+  <h2>{faq.nombre}</h2>
+
+  <dl style="margin-top: 2rem; display: grid; gap: 1.75rem; max-width: 42rem;">
+    {
+      faq.preguntas.map((p) => (
+        <div>
+          <dt>
+            <h3>{p.q}</h3>
+          </dt>
+          <dd style="margin-top: 0.4rem; margin-inline-start: 0; color: var(--color-ink-2);">{p.a}</dd>
+        </div>
+      ))
+    }
+  </dl>
+
+  <p style="margin-top: 2.5rem;">
+    <a class="btn" href={`${url('/')}#lista-de-espera`}>{faq.cta}</a>
+  </p>
+</section>

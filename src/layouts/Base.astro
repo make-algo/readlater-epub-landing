@@ -1,0 +1,58 @@
+---
+import '../styles/global.css'
+import { absoluteUrl, url } from '../lib/site'
+import { site, saltar } from '../content/copy'
+
+interface Props {
+  title?: string
+  description?: string
+  ogTitle?: string
+  path?: string
+}
+
+const {
+  title = site.title,
+  description = site.description,
+  ogTitle = title,
+  path = '/',
+} = Astro.props
+
+const canonical = absoluteUrl(path)
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!--
+      Versión de prueba: fuera de los buscadores hasta que haya lanzamiento
+      aprobado. Quitar este `noindex` y desbloquear robots.txt es una
+      decisión humana, no del equipo (ver `readlater-epub-producto`).
+    -->
+    <meta name="robots" content="noindex, nofollow" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ReadLater EPUB" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={ogTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <slot name="head" />
+  </head>
+  <body>
+    <a href="#contenido" class="skip">{saltar}</a>
+    <slot />
+  </body>
+</html>

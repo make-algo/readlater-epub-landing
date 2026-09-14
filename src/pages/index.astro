@@ -1,0 +1,43 @@
+---
+import Base from '../layouts/Base.astro'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import Demo from '../components/secciones/Demo.astro'
+import Pasos from '../components/secciones/Pasos.astro'
+import Comparativa from '../components/secciones/Comparativa.astro'
+import Privacidad from '../components/secciones/Privacidad.astro'
+import Cta from '../components/secciones/Cta.astro'
+import Faq from '../components/secciones/Faq.astro'
+import { hero } from '../content/copy'
+
+/**
+ * Control — las siete secciones, en su orden definitivo, Fase 3 de
+ * `launch-squad` (MAK-95): Héroe, Demo, Cómo funciona, Comparativa,
+ * Privacidad, CTA, FAQ. Todo el texto visible sale de `src/content/copy.ts`
+ * y va literal; esta página solo decide la composición. `/a/` y `/b/`
+ * (Fase 4, divergencia) heredan de aquí lo que está congelado.
+ */
+---
+
+<Base ogTitle={hero.titular} path="/">
+  <Header />
+
+  <main id="contenido">
+    <section id="hero" class="wrap" style="padding-top: clamp(2.5rem, 6vw, 4.5rem);">
+      <h1>{hero.titular}</h1>
+      <p class="lead" style="margin-top: 1.25rem;">{hero.subtitulo}</p>
+      <p style="margin-top: 1.75rem;">
+        <a class="btn" href="#lista-de-espera">{hero.cta}</a>
+      </p>
+    </section>
+
+    <Demo />
+    <Pasos />
+    <Comparativa />
+    <Privacidad />
+    <Cta />
+    <Faq />
+  </main>
+
+  <Footer />
+</Base>

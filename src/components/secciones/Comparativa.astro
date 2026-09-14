@@ -1,0 +1,21 @@
+---
+import { comparativa } from '../../content/copy'
+---
+
+<section id="comparativa" class="wrap">
+  <p class="eyebrow">Comparativa</p>
+  <h2>{comparativa.nombre}</h2>
+
+  <div style="margin-top: 2rem; display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));">
+    <div data-fila-comparativa style="border: 1px solid var(--color-line); border-radius: var(--radius); padding: 1.25rem;">
+      <h3>{comparativa.sendToKindle.titulo}</h3>
+      <p style="margin-top: 0.5rem; color: var(--color-ink-2);">{comparativa.sendToKindle.texto}</p>
+    </div>
+    <div data-fila-comparativa style="border: 1px solid var(--color-accent); border-radius: var(--radius); padding: 1.25rem; background: var(--color-accent-wash);">
+      <h3>{comparativa.readlater.titulo}</h3>
+      <p style="margin-top: 0.5rem; color: var(--color-ink-2);">{comparativa.readlater.texto}</p>
+    </div>
+  </div>
+
+  <p class="lead" style="margin-top: 1.5rem;">{comparativa.otros}</p>
+</section>
