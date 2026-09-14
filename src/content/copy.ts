@@ -28,10 +28,16 @@ export const demo = {
   nombre: 'Así llega a tu Kindle',
   intro:
     'El resultado no son artículos sueltos: es un único EPUB con índice, navegable como un libro.',
-  rotulo: 'Vista previa en lector de escritorio — pendiente sustituir por fotografía de Kindle real',
-  placeholderId: 'kindle-real-pendiente',
-  indiceAlt: 'Tabla de contenidos del EPUB generado por ReadLater EPUB, con los artículos guardados de la semana',
-  paginaAlt: 'Página de artículo dentro del EPUB, con tipografía y maquetación pensadas para e-ink',
+  colWeb: 'Web original',
+  colEpub: 'EPUB generado',
+  colEpubFuente: 'readlater · índice navegable',
+  tabWeb: 'Web',
+  tabEpub: 'Kindle',
+  fallbackAviso: 'Vista estática — el sitio original no permite embebido en vivo',
+  lectorError: 'No se ha podido cargar la vista previa del EPUB.',
+  // Contenido de relleno hasta que MAK-91 entregue el EPUB real (ver src/lib/demo.ts).
+  notaContenido:
+    'El EPUB de la derecha usa un fichero de ejemplo con contenido de relleno — se sustituye por el que genera la propia app en cuanto esté disponible.',
 } as const
 
 export const pasos = {
