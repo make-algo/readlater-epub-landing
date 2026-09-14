@@ -1,0 +1,241 @@
+/* ============================================================================
+   ReadLater EPUB — variante A, capa sistémica del "objeto como mensaje".
+   El material es el libro físico: cabecero de página, folio, corte entre
+   páginas, sello en vez de botón, anotación al margen. Se aplica sobre las
+   reglas heredadas de `base.css` para que las secciones que la variante NO
+   maqueta a mano (Cómo funciona, Privacidad, CTA, FAQ) hereden el sistema sin
+   tocar su composición — solo cambian los tokens y esta capa. Nada aquí
+   contradice `prefers-reduced-motion`, ya resuelto en `base.css`.
+   ========================================================================= */
+
+@layer components {
+  /* -- Cabecera del sitio, estrecha ---------------------------------------
+     `Header.astro` (heredado) pone logo y CTA en una sola fila sin
+     `flex-wrap`; con esta tipografía en versalitas el botón es más ancho
+     que en el control y a partir de ~400px se solapa con el logo. Se
+     resuelve aquí, sin tocar el componente compartido. */
+  body > header.wrap {
+    flex-wrap: wrap;
+    row-gap: 0.6rem;
+  }
+
+  /* -- Cabecero de página -----------------------------------------------
+     El `.eyebrow` pasa a versalitas itálicas sin regla propia: la única
+     regla que marca "aquí empieza otra página" es el corte entre secciones
+     de más abajo. Repetir label+regla+label+regla siete veces es el
+     muletón de plantilla editorial que señaló la primera ronda de crítica;
+     con la regla quitada, el folio en el margen es lo que hace ese trabajo. */
+  .eyebrow {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 0.8125rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+    display: block;
+  }
+
+  /* -- H1: portada, no h1 de landing --------------------------------------
+     Tracking negativo agresivo y una sola voz de peso: la escala hace el
+     trabajo de jerarquía. La capitular en el acento repite en el titular
+     el mismo gesto que abre la página de artículo en la demo — el mismo
+     material, no un adorno suelto. */
+  h1 {
+    letter-spacing: -0.03em;
+    line-height: 0.97;
+    text-wrap: balance;
+  }
+  h1::first-letter {
+    color: var(--color-accent);
+  }
+
+  /* -- Folio ---------------------------------------------------------
+     Numeral romano, no "01/02/03" — ese es justo el tic de plantilla
+     editorial que delata a un kit de landing. Un folio en romanos, fino,
+     en el margen izquierdo, es lo que lleva una portadilla de libro de
+     verdad. Las siete secciones son las siete páginas del libro. */
+  body { counter-reset: folio; }
+  main > section,
+  #hero {
+    counter-increment: folio;
+    position: relative;
+  }
+  main > section::after,
+  #hero::after {
+    content: counter(folio, upper-roman);
+    position: absolute;
+    left: 1.5rem;
+    bottom: 1.5rem;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.5rem;
+    color: var(--color-ink-3);
+    opacity: 0.5;
+    letter-spacing: 0.04em;
+  }
+
+  /* -- Corte entre páginas, recto/verso -----------------------------------
+     Sombra alta y tenue en el borde superior de cada sección (salvo la
+     primera) simulando el filo de una página. Además, las páginas pares
+     llevan un tinte de papel apenas distinto — el gesto real de un libro
+     abierto, donde la hoja de la derecha nunca es idéntica a la de la
+     izquierda — así las siete secciones dejan de leerse como la misma
+     plantilla copiada siete veces. */
+  main > section:not(:first-of-type) {
+    box-shadow: inset 0 9px 7px -9px rgb(0 0 0 / 0.16);
+  }
+  main > section:nth-of-type(even):not(.banda) {
+    background: color-mix(in srgb, var(--color-paper) 94%, var(--color-ink) 6%);
+  }
+
+  /* -- Botón como sello --------------------------------------------------
+     Nada de píldora redondeada: un sello de biblioteca, versalitas. El
+     mismo CTA se repite cuatro veces en la página (cabecera, héroe, lista
+     de espera, FAQ) — para que no lea como el mismo botón pegado cuatro
+     veces, solo uno lleva tinta sólida: el de conversión real al final del
+     argumento (héroe y sección de lista de espera). Los de paso —
+     cabecera y cierre del FAQ, que solo llevan de vuelta al mismo
+     formulario — quedan en hueco, como una referencia, no una repetición. */
+  .btn {
+    font-family: var(--font-serif);
+    font-style: normal;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: var(--text-small);
+    padding: 0.7rem 1.6rem;
+    border-radius: var(--radius);
+  }
+  header.wrap .btn,
+  #faq .btn {
+    background: transparent;
+    color: var(--color-ink);
+    border-color: var(--color-ink);
+  }
+  header.wrap .btn:hover,
+  #faq .btn:hover {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    border-color: var(--color-ink);
+  }
+
+  /* -- El rojo se raciona ---------------------------------------------
+     La primera ronda lo repartía en enlaces, botones, avisos y bordes por
+     igual y dejaba de leerse como acento. Aquí el rojo vive solo en tres
+     sitios: el botón de conversión, el subrayado de la opción elegida en
+     la comparativa y la capital de la página de artículo. Todo lo demás —
+     enlaces de cuerpo, foco, avisos — se queda en tinta. */
+  a { color: var(--color-ink); text-decoration: underline; text-decoration-color: var(--color-line); text-underline-offset: 0.18em; }
+  a:hover { color: var(--color-ink); text-decoration-color: var(--color-ink); }
+  .btn { color: var(--color-paper); } /* el botón es la única superficie sólida de acento */
+
+  .notice, .alert {
+    border-radius: 0;
+    font-family: var(--font-serif);
+    font-style: italic;
+  }
+  .notice { background: var(--color-paper-raised); border-color: var(--color-line); color: var(--color-ink-2); }
+
+  /* -- Formulario en el mismo registro ------------------------------------ */
+  .field label,
+  legend {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+  }
+  .radio { font-family: var(--font-serif); }
+  input[type='radio'] { accent-color: var(--color-ink); }
+  .field input[type='email'] { border-radius: 0; }
+
+  /* -- Demo: el libro abierto es la pieza, no una imagen de blog ---------
+     Es lo que demuestra la promesa entera del producto, así que ocupa más
+     que el resto de bloques de la página, rompe el centrado del resto de
+     secciones desplazándose al borde izquierdo de `.wrap`, y se apoya en
+     una sombra de objeto real — un libro sobre la mesa, no una tarjeta. */
+  .spread {
+    margin-top: 2.75rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    max-width: 58rem;
+    margin-inline-end: auto;
+    box-shadow: 0 28px 46px -22px rgb(23 20 13 / 0.38);
+  }
+  .spread > figure {
+    margin: 0;
+    background: var(--color-paper-raised);
+    border: 1px solid var(--color-line);
+    padding: 1.5rem 1.5rem 1.25rem;
+  }
+  .spread > figure:first-child {
+    border-right: none;
+    border-radius: 2px 0 0 2px;
+    box-shadow: inset -10px 0 14px -12px rgb(0 0 0 / 0.35);
+  }
+  .spread > figure:last-child {
+    border-radius: 0 2px 2px 0;
+    box-shadow: inset 10px 0 14px -12px rgb(0 0 0 / 0.35);
+  }
+  .spread img { width: 100%; height: auto; display: block; }
+  .spread-caption {
+    margin-top: 0.75rem;
+    max-width: 58rem;
+    text-align: right;
+    color: var(--color-ink-3);
+    font-size: 0.8125rem;
+    font-style: italic;
+    opacity: 0.85;
+  }
+  @media (max-width: 47.9375rem) {
+    .spread {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+      box-shadow: 0 20px 32px -20px rgb(23 20 13 / 0.35);
+    }
+    .spread > figure:first-child,
+    .spread > figure:last-child {
+      border: 1px solid var(--color-line);
+      border-radius: 2px;
+      box-shadow: inset 0 -10px 14px -12px rgb(0 0 0 / 0.35);
+    }
+  }
+
+  /* -- Comparativa: notas al margen, no tarjetas -------------------------- */
+  .marginalia {
+    margin-top: 2.5rem;
+    display: grid;
+    gap: 1.75rem;
+    max-width: 42rem;
+    border-top: 1px solid var(--color-line);
+    padding-top: 1.5rem;
+  }
+  .marginalia > div { display: flex; gap: 0.9rem; }
+  .marginalia .num {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--color-ink-3);
+    flex: none;
+  }
+  .marginalia h3 {
+    display: inline;
+    font-size: 1.375rem;
+  }
+  .marginalia--descartada h3 {
+    color: var(--color-ink-2);
+    text-decoration: underline wavy var(--color-line) 1px;
+    text-underline-offset: 0.25rem;
+  }
+  .marginalia--elegida h3 {
+    text-decoration: underline solid var(--color-accent) 2px;
+    text-underline-offset: 0.25rem;
+  }
+  .marginalia--elegida .num { color: var(--color-accent); font-style: normal; font-weight: 700; }
+
+  /* -- FAQ: cada pregunta como entrada de página, no una lista plana ------ */
+  #faq dt h3 { font-weight: 700; }
+  #faq dl > div:not(:first-child) {
+    border-top: 1px solid var(--color-line);
+    padding-top: 1.5rem;
+  }
+}

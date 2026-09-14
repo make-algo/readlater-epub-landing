@@ -1,0 +1,34 @@
+---
+import { comparativa } from '../../content/copy'
+
+/**
+ * Variante A — la comparativa como anotación al margen de un libro, no como
+ * tarjetas: la opción descartada lleva un subrayado ondulado (la duda a
+ * lápiz), la elegida un subrayado sólido en el acento (la marca de quien ya
+ * decidió). Mismo copy y mismo orden que el control.
+ */
+---
+
+<section id="comparativa" class="wrap">
+  <p class="eyebrow">Comparativa</p>
+  <h2>{comparativa.nombre}</h2>
+
+  <div class="marginalia">
+    <div class="marginalia--descartada">
+      <span class="num">1.</span>
+      <div>
+        <h3>{comparativa.sendToKindle.titulo}</h3>
+        <p style="margin-top: 0.3rem; color: var(--color-ink-2);">{comparativa.sendToKindle.texto}</p>
+      </div>
+    </div>
+    <div class="marginalia--elegida">
+      <span class="num">2.</span>
+      <div>
+        <h3>{comparativa.readlater.titulo}</h3>
+        <p style="margin-top: 0.3rem; color: var(--color-ink-2);">{comparativa.readlater.texto}</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="lead" style="margin-top: 1.5rem;">{comparativa.otros}</p>
+</section>

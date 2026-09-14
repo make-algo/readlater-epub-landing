@@ -17,6 +17,7 @@ import { join } from 'node:path'
 
 const RUTAS = [
   ['control /', 'dist/index.html'],
+  ['variante A /a/', 'dist/a/index.html'],
   ['variante B /b/', 'dist/b/index.html'],
 ]
 
