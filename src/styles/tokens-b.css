@@ -1,0 +1,54 @@
+/* ============================================================================
+   ReadLater EPUB — tokens de la variante B, "Ya lo conoces" (Fase 4, MAK-100)
+   Material: la lista con check de Recordatorios y la superficie agrupada de
+   Ajustes/Notas en macOS — lienzo gris de sistema, tarjetas blancas insertadas,
+   acento azul de sistema, cabeceras en SF Pro Rounded. Mismos nombres de
+   variable que `tokens.css` del control: así todo lo que ya usa `var(--color-*)`
+   en los componentes compartidos (Header, Footer, Pasos, Privacidad, Cta, Faq)
+   cambia de piel sin que se toque una sola línea de esos ficheros.
+
+   Contraste verificado (WCAG AA, 4.5:1 texto / 3:1 UI) con los pares reales
+   que se usan en esta página — no son los valores "de catálogo" de Apple sin
+   más: se han oscurecido donde hacía falta para pasar el umbral.
+   ========================================================================= */
+
+@theme {
+  --color-paper:        #F2F2F7; /* lienzo — systemGroupedBackground        */
+  --color-paper-sunk:   #FFFFFF; /* tarjeta agrupada (banda: CTA, Privacidad) */
+  --color-paper-raised: #FFFFFF; /* superficie de la demo                    */
+
+  --color-ink:          #1C1C1E; /* label — texto principal                  */
+  --color-ink-2:        #3C3C43; /* secondaryLabel — texto de apoyo          */
+  --color-ink-3:        #6E6E73; /* tertiaryLabel — eyebrow, pies de foto    */
+
+  --color-line:         #D1D1D6; /* separator — divisorias de fila           */
+  --color-border:       #8A8A8E; /* borde de campo de formulario (3:1 en blanco) */
+
+  --color-accent:       #0066CC; /* systemBlue oscurecido para AA en texto   */
+  --color-accent-strong:#0051D5; /* hover / active                           */
+  --color-accent-wash:  #E5F1FF; /* fondo de fila seleccionada                */
+
+  --color-check:        #248A3D; /* systemGreen oscurecido — check de lista  */
+  --color-error:        #D70015; /* systemRed oscurecido para AA en texto    */
+
+  /* SF Pro Rounded vía la palabra clave genérica `ui-rounded`: en macOS/iOS
+     Safari la resuelve a la tipografía real del sistema (la misma de los
+     títulos grandes de Recordatorios) sin cargar ningún activo; en el resto
+     cae a system-ui. Se asigna a `--font-serif` — el nombre que ya usan
+     h1/h2/h3 en `global.css` — para no tocar ese fichero. */
+  --font-serif: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif;
+  --font-sans:  -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+
+  --text-display: clamp(1.75rem, 1rem + 3.4vw, 3.75rem);
+  --text-h2:      clamp(1.5rem, 1.15rem + 1.6vw, 2.25rem);
+  --text-h3:      clamp(1.125rem, 1rem + 0.6vw, 1.375rem);
+  --text-body:    1.0625rem;
+  --text-small:   0.9375rem;
+
+  --wrap: 68rem;
+  --radius: 1rem; /* la tarjeta agrupada, no la esquina apenas biselada del control */
+
+  --focus-width: 3px;
+  --focus-offset: 2px;
+  --color-focus: #0066CC;
+}
