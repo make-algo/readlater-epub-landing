@@ -2,38 +2,58 @@
 import { comparativa } from '../../../content/copy'
 
 /**
- * Sección 4 — Comparativa, variante B (Fase 4, MAK-100) — ronda 2. Mismo
- * copy y mismo argumento que el control. Dos filas sueltas sobre el lienzo,
- * sin tarjeta ni fondo de color — el crítico de la ronda 1 señaló que la
- * tarjeta con fondo azul mezclaba vocabulario de formulario con lo que es
- * una comparación editorial. El check en verde ya dice cuál gana; no hace
- * falta subrayarlo también con un fondo.
+ * Sección 4 — Comparativa, variante D (Fase 4 ronda 2, MAK-124). Reemplaza
+ * la comparativa de la variante B de la ronda 1 (MAK-100), que resolvía el
+ * cotejo como dos filas sueltas. Aquí es una tabla real de especificaciones:
+ * encabezados de fila y columna, marcas de verificación tipográficas (✓/✕,
+ * no iconos), y la columna propia marcada por la franja de acento a la
+ * izquierda y por su posición en la tabla — nunca por un fondo de color
+ * que la convierta en tarjeta. Mismo copy y mismo argumento que el control.
  */
 ---
 
 <section id="comparativa" class="wrap">
+  <div class="ficha-doc__bar">
+    <span class="ficha-doc__id">Ficha 03 — Comparativa</span>
+    <span>Tabla de especificaciones</span>
+  </div>
+
   <p class="eyebrow">Comparativa</p>
   <h2>{comparativa.nombre}</h2>
 
-  <div style="margin-top: 2rem; max-width: 42rem; border-top: 1px solid var(--color-line);">
-    <div class="linkrow" data-fila-comparativa>
-      <svg class="listrow__check" viewBox="0 0 24 24" width="24" height="24" style="flex:none; margin-top:0.15rem;"><circle cx="12" cy="12" r="9.5" fill="none" stroke="var(--color-ink-3)" stroke-width="1.6" /></svg>
-      <div>
-        <h3>{comparativa.sendToKindle.titulo}</h3>
-        <p style="margin-top: 0.35rem; color: var(--color-ink-2);">{comparativa.sendToKindle.texto}</p>
-      </div>
-    </div>
-    <div class="linkrow" data-fila-comparativa>
-      <svg class="listrow__check" viewBox="0 0 24 24" width="24" height="24" style="flex:none; margin-top:0.15rem;">
-        <circle cx="12" cy="12" r="9.5" fill="var(--color-check)" />
-        <path d="M7.5 12.5 L10.3 15.3 L16.5 8.5" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-      <div>
-        <h3>{comparativa.readlater.titulo}</h3>
-        <p style="margin-top: 0.35rem; color: var(--color-ink-2);">{comparativa.readlater.texto}</p>
-      </div>
-    </div>
-  </div>
+  <table class="ficha-tabla" style="margin-top: 2rem;">
+    <caption class="solo-lectores">
+      Comparación de especificaciones entre Send to Kindle y ReadLater EPUB
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col" class="ficha-tabla__rowhead"><span class="reftag">Ref.</span></th>
+        <th scope="col">{comparativa.sendToKindle.titulo}</th>
+        <th scope="col" class="ficha-tabla__destacada">
+          {comparativa.readlater.titulo}
+          <span class="reftag" style="display: block; margin-top: 0.3rem;">Seleccionado</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">Qué hace</th>
+        <td>{comparativa.sendToKindle.texto}</td>
+        <td class="ficha-tabla__destacada">{comparativa.readlater.texto}</td>
+      </tr>
+      <tr>
+        <th scope="row">Veredicto</th>
+        <td>
+          <span class="verifica verifica--no" aria-hidden="true">✕</span>
+          <span class="solo-lectores">No</span>
+        </td>
+        <td class="ficha-tabla__destacada">
+          <span class="verifica verifica--si" aria-hidden="true">✓</span>
+          <span class="solo-lectores">Sí</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
   <p class="lead" style="margin-top: 1.5rem;">{comparativa.otros}</p>
 </section>

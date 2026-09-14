@@ -1,11 +1,13 @@
 /* ============================================================================
-   ReadLater EPUB — hoja de la variante B (Fase 4, MAK-100)
+   ReadLater EPUB — hoja de la variante D, "Ficha técnica / dossier"
+   (Fase 4 ronda 2, MAK-124). Publicada en `/b/`, reemplaza la hoja de la
+   variante B de la ronda 1 (MAK-100).
+
    Deliberadamente NO importa `global.css` del control: es una hoja hermana,
-   independiente, para que tocar esta variante no vuelva a poner en revisión
-   el esqueleto compartido. Reproduce las mismas clases (`.wrap`, `.btn`,
-   `.banda`, `.field`…) que usan Header/Footer/Pasos/Privacidad/Cta/Faq, con
-   los valores de `tokens-b.css`, y añade las clases propias del tramo que sí
-   maqueta esta variante: héroe, demo y comparativa.
+   independiente. Reproduce las mismas clases (`.wrap`, `.btn`, `.banda`,
+   `.field`…) que usan Header/Footer/Pasos/Privacidad/Cta/Faq, con los
+   valores de `tokens-b.css`, y añade las clases propias del tramo que sí
+   maqueta esta variante: héroe, demo y comparativa como ficha técnica.
    ========================================================================= */
 
 @import "tailwindcss";
@@ -36,13 +38,14 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  h1, h2, h3, p, ul, ol, li, figure, dl, dd { margin: 0; }
+  h1, h2, h3, p, ul, ol, li, figure, dl, dd, table, caption, th, td { margin: 0; }
   p { text-wrap: pretty; }
+  table { border-collapse: collapse; }
 
   :focus-visible {
     outline: var(--focus-width) solid var(--color-focus);
     outline-offset: var(--focus-offset);
-    border-radius: inherit;
+    border-radius: 0;
   }
 
   .skip {
@@ -52,11 +55,22 @@
     background: var(--color-ink);
     color: var(--color-paper);
     padding: 0.6rem 1rem;
-    border-radius: var(--radius);
     transition: top 0.15s ease;
     z-index: 50;
   }
   .skip:focus { top: 1rem; }
+
+  /* Visible solo para lectores de pantalla — a diferencia de `.hp` (honeypot,
+     oculto también a AT), esto SÍ debe anunciarse: leyendas de tabla, texto
+     alternativo de un glifo tipográfico. */
+  .solo-lectores {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
 }
 
 @layer components {
@@ -66,13 +80,13 @@
     padding-inline: 1.5rem;
   }
 
-  section { padding-block: clamp(2.25rem, 5vw, 4.75rem); }
+  section { padding-block: clamp(2.75rem, 5.5vw, 5rem); }
 
   .eyebrow {
     font-family: var(--font-sans);
     font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.01em;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-ink-3);
   }
@@ -80,57 +94,53 @@
   h1 {
     font-family: var(--font-serif);
     font-size: var(--text-display);
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
     color: var(--color-ink);
   }
 
   h2 {
     font-family: var(--font-serif);
     font-size: var(--text-h2);
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -0.015em;
+    font-weight: 700;
+    line-height: 1.2;
     color: var(--color-ink);
   }
 
   h3 {
     font-family: var(--font-serif);
     font-size: var(--text-h3);
-    font-weight: 700;
+    font-weight: 600;
     color: var(--color-ink);
   }
 
   .lead {
-    font-size: 1.125rem;
+    font-size: 1.0625rem;
     color: var(--color-ink-2);
     max-width: 46rem;
   }
 
-  /* Botón de sistema: cápsula llena, como el botón por defecto de una hoja
-     de Ajustes de macOS — nunca el rectángulo de esquina apenas redondeada
-     del control. */
+  /* Botón: rectángulo recto, en el color de estado — el único punto de la
+     página donde el acento rellena en vez de marcar una franja: es la
+     acción, no una anotación sobre ella. */
   .btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     background: var(--color-accent);
-    color: #FFFFFF;
-    font-weight: 600;
-    padding: 0.8rem 1.75rem;
-    border-radius: 0.75rem; /* rectángulo continuo de macOS, no la cápsula de iOS: mismo sistema de radios que las tarjetas, no uno aparte */
+    color: var(--color-paper);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    padding: 0.75rem 1.5rem;
     text-decoration: none;
     border: 1px solid var(--color-accent);
     white-space: nowrap;
-    font-size: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
+    font-size: clamp(0.875rem, 0.75rem + 0.4vw, 1rem);
   }
   .btn:hover { background: var(--color-accent-strong); border-color: var(--color-accent-strong); }
   .btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
-  /* Cabecera — mismo criterio que `base.css` del control: el CTA de nav baja
-     entero a su propia línea en móvil estrecho en vez de partirse a mitad
-     de palabra contra la etiqueta de formato de la marca. */
   .site-header {
     padding-block: 1.25rem;
     display: flex;
@@ -139,35 +149,30 @@
     flex-wrap: wrap;
     row-gap: 0.5rem;
     column-gap: 1.5rem;
+    border-bottom: 1px solid var(--color-line);
   }
   .site-header .btn-ghost { white-space: nowrap; }
 
-  /* Refuerzo del CTA (nav, cierres de sección) — mismo criterio que
-     `base.css` del control: `.btn` sólido queda para la sección CTA, el
-     resto es un enlace con filete. Ver Header.astro/Faq.astro, compartidos
-     entre control, A y B. */
   .btn-ghost {
     display: inline-flex;
     align-items: baseline;
     gap: 0.4rem;
     color: var(--color-accent);
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: none;
     border-block-end: 1.5px solid var(--color-accent);
     padding-block-end: 0.15rem;
   }
   .btn-ghost:hover { color: var(--color-accent-strong); border-color: var(--color-accent-strong); }
 
-  /* Marca — mismo criterio que `base.css` del control, con la piel propia
-     de esta variante (SF Pro Rounded vía `--font-serif`). */
   .marca { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; color: var(--color-ink); }
   .marca-texto {
     display: inline-flex;
     align-items: baseline;
     gap: 0.55rem;
     font-family: var(--font-serif);
-    font-size: 1.1875rem;
-    font-weight: 600;
+    font-size: 1.0625rem;
+    font-weight: 700;
     letter-spacing: -0.01em;
   }
   .marca-formato {
@@ -184,123 +189,164 @@
   a { color: var(--color-accent); }
   a:hover { color: var(--color-accent-strong); }
 
-  /* La "banda" del control (Privacidad, CTA) se convierte aquí en la tarjeta
-     agrupada blanca de Ajustes: en desktop ya queda insertada porque `.wrap`
-     limita el ancho a `--wrap` y dentro de esa caja no hay más blanco que
-     la propia tarjeta; en pantallas estrechas, sin ese límite, el margen
-     que aísla la tarjeta del borde hay que darlo explícitamente o la tarjeta
-     se pega a los dos cantos y deja de leerse como tarjeta — precisamente
-     el estado "móvil estrecho" que corresponde a `ux` cubrir. */
+  /* La "banda" del control (Privacidad, CTA) es aquí un módulo de la ficha:
+     borde recto de tinta, sin sombra ni margen que la aísle como tarjeta. */
   .banda {
     background: var(--color-paper-sunk);
-    margin-inline: 0.875rem;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03), 0 10px 30px -18px rgba(28, 28, 30, 0.35);
-  }
-  @media (min-width: 40rem) {
-    .banda { margin-inline: auto; }
+    border: 1px solid var(--color-line);
   }
 
-  .field label { display: block; font-weight: 600; margin-bottom: 0.35rem; }
+  .field label { display: block; font-weight: 700; margin-bottom: 0.35rem; font-size: var(--text-small); text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-ink-3); }
   .field input[type='email'],
   .field textarea {
     width: 100%;
-    padding: 0.7rem 0.9rem;
+    padding: 0.65rem 0.85rem;
     border: 1px solid var(--color-border);
-    border-radius: 0.6rem;
     background: var(--color-paper-raised);
     color: var(--color-ink);
     font: inherit;
   }
-  .field--bad input { border-color: var(--color-error); }
+  .field--bad input { border-color: var(--color-error); border-width: 2px; }
   .err { display: block; color: var(--color-error); font-size: var(--text-small); min-height: 1.2em; }
 
   .radios { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
   .radio { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 400; }
 
   .notice {
-    background: var(--color-accent-wash);
-    color: var(--color-accent-strong);
-    border: 1px solid var(--color-accent);
-    border-radius: 0.6rem;
+    background: var(--color-paper);
+    color: var(--color-ink-2);
+    border: 1px solid var(--color-line);
+    border-inline-start: 3px solid var(--color-accent);
     padding: 0.6rem 0.85rem;
     font-size: var(--text-small);
   }
 
   .alert {
-    background: #FCE8E6;
-    color: var(--color-error);
+    background: var(--color-accent-wash);
+    color: var(--color-accent-strong);
     border: 1px solid var(--color-error);
-    border-radius: 0.6rem;
     padding: 0.6rem 0.85rem;
     font-size: var(--text-small);
   }
 
-  .done { border: 1px solid var(--color-line); border-radius: 0.6rem; padding: 1rem 1.25rem; background: var(--color-paper-raised); }
+  .done { border: 1px solid var(--color-line); padding: 1rem 1.25rem; background: var(--color-paper-raised); }
 
   .hp { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-  /* ---- Propio de la variante: héroe, demo, comparativa ------------------
-     Un solo material, sin caja que lo contenga: la fila de Recordatorios
-     viviendo directamente sobre el lienzo de la página, sin ventana de
-     macOS ni tarjeta con sombra de por medio — eso ya es "mockup de SaaS
-     genérico". Lo que hace que esto sea de Recordatorios y no de cualquier
-     otra app es el detalle real que nadie más tiene: el enlace guardado
-     ahí se ve como un enlace enriquecido (título + dominio), no como una
-     tarea de texto suelto. */
-
-  .linkrow {
+  /* ---- Barra de cabecera de documento — el dispositivo que recorre las
+     tres secciones propias de esta variante (Héroe, Demo, Comparativa):
+     un identificador de ficha + una anotación de estado, como el cajetín
+     de un plano técnico. Puramente tipográfico, sin icono. */
+  .ficha-doc__bar {
     display: flex;
-    align-items: flex-start;
-    gap: 0.85rem;
-    padding-block: 0.95rem;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    padding-block-end: 0.75rem;
+    margin-block-end: 1.5rem;
+    border-block-end: 1px solid var(--color-line);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
   }
-  .linkrow + .linkrow { border-top: 1px solid var(--color-line); }
-  .linkrow__titulo { font-weight: 600; color: var(--color-ink); }
-  .linkrow__dominio { display: block; margin-top: 0.1rem; color: var(--color-ink-3); font-size: var(--text-small); }
-  .linkrow__check {
-    flex: none;
-    width: 1.35rem;
-    height: 1.35rem;
-    margin-top: 0.15rem;
-    margin-left: auto;
-  }
+  .ficha-doc__id { color: var(--color-ink); }
 
-  /* La misma fila, ya convertida: gana folio (número de página) y check, con
-     el mismo recurso tipográfico que un índice de libro impreso — o el de
-     Apple Books — de verdad: puntos guía entre el título y la página. Nadie
-     compite con esto porque nadie más está vendiendo "esto se convierte en
-     un libro". Reaparece en Demo con el mismo tipo de fila, para que se lea
-     como continuación del héroe y no como una segunda maqueta distinta. */
-  .indexrow {
+  /* ---- Franja de especificación del héroe: tres celdas, dos hairlines
+     verticales. Es el resumen entrada → proceso → salida del producto,
+     leído como una fila de datasheet, no como un icono decorativo. */
+  .specstrip {
+    margin-top: clamp(2rem, 5vw, 3.5rem);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid var(--color-line);
+  }
+  .specstrip__cell {
+    padding: 0.85rem 1.1rem;
     display: flex;
-    align-items: baseline;
-    gap: 0.6rem;
-    padding-block: 0.8rem;
+    flex-direction: column;
+    gap: 0.4rem;
   }
-  .indexrow + .indexrow { border-top: 1px solid var(--color-line); }
-  .indexrow__check { flex: none; width: 1.05rem; height: 1.05rem; margin-bottom: -0.05rem; }
-  .indexrow__titulo { color: var(--color-ink); white-space: nowrap; }
-  .indexrow__leader {
-    flex: 1;
-    min-width: 1rem;
-    border-bottom: 1px dotted var(--color-border);
-    margin-bottom: 0.35em;
+  .specstrip__cell + .specstrip__cell { border-inline-start: 1px solid var(--color-line); }
+  .specstrip__label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
   }
-  .indexrow__folio { color: var(--color-ink-3); font-size: var(--text-small); font-variant-numeric: tabular-nums; }
+  .specstrip__valor { color: var(--color-ink); font-size: var(--text-small); }
+  @media (max-width: 40rem) {
+    .specstrip { grid-template-columns: 1fr; }
+    .specstrip__cell + .specstrip__cell { border-inline-start: none; border-block-start: 1px solid var(--color-line); }
+  }
 
-  /* El "esto se convierte en esto": tres glifos en línea, monocromos a
-     propósito — ya hay color de sobra en las insignias de arriba. */
-  .conversion {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
+  /* Pequeña etiqueta de referencia, tipo cota de plano: siempre monoespaciada
+     y con tracking abierto, nunca un badge con fondo de color. */
+  .reftag {
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--color-ink-3);
   }
 
-  /* ---- Compartido con el control y la variante A (MAK-104) --------------
-     Pasos/Privacidad/Cta/Faq no cambian entre rutas: estas reglas reproducen
-     las mismas de `base.css`, con los nombres de variable que ya usa esta
-     hoja — mismo criterio de composición, piel de la variante B. */
+  /* ---- Tabla de especificaciones (Comparativa): encabezados de fila y
+     columna reales, hairlines en vez de tarjetas, y la columna propia
+     marcada por una franja de acento a la izquierda — nunca por un fondo
+     de color que cubra la celda entera. */
+  .ficha-tabla {
+    width: 100%;
+    border: 1px solid var(--color-line);
+    font-size: var(--text-small);
+  }
+  .ficha-tabla th,
+  .ficha-tabla td {
+    padding: 0.85rem 1.1rem;
+    border: 1px solid var(--color-line);
+    text-align: left;
+    vertical-align: top;
+    font-weight: 400;
+  }
+  .ficha-tabla thead th {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--color-ink);
+    background: var(--color-paper-sunk);
+  }
+  .ficha-tabla tbody th {
+    font-weight: 700;
+    color: var(--color-ink-3);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .ficha-tabla__rowhead { background: var(--color-paper-sunk); }
+  .ficha-tabla__destacada {
+    border-inline-start: 3px solid var(--color-accent);
+  }
+  .ficha-tabla__destacada .reftag { color: var(--color-accent); }
+  @media (max-width: 34rem) {
+    .ficha-tabla { font-size: 0.875rem; }
+    .ficha-tabla th, .ficha-tabla td { padding: 0.65rem 0.7rem; }
+  }
+
+  /* Marca de verificación tipográfica — el carácter hace de icono, sin SVG
+     ni círculo relleno. */
+  .verifica {
+    font-weight: 700;
+    font-size: 1.125rem;
+  }
+  .verifica--si { color: var(--color-check); }
+  .verifica--no { color: var(--color-ink-3); }
+
+  /* ---- Compartido con el control y las variantes hermanas — Pasos,
+     Privacidad, Cta y Faq no cambian entre rutas (heredadas sin tocar):
+     estas reglas reproducen las mismas de `base.css`, con la piel recta y
+     monoespaciada de esta variante. */
   .secuencia {
     list-style: none;
     padding: 0;
@@ -319,13 +365,13 @@
   .secuencia li:last-child { border-block-end: none; }
   .secuencia-marca {
     font-family: var(--font-serif);
-    font-size: 2.5rem;
+    font-size: 2rem;
     line-height: 1;
     font-weight: 400;
     color: var(--color-line);
   }
 
-  .declaracion { padding-block: clamp(4.5rem, 10vw, 8.5rem); }
+  .declaracion { padding-block: clamp(3.25rem, 7vw, 6rem); }
   .declaracion-cuerpo {
     margin-top: 2rem;
     margin-inline-start: auto;
@@ -335,15 +381,19 @@
     padding-inline-end: 1.75rem;
   }
   .declaracion-cuerpo .lead { margin-inline-start: auto; }
-  .declaracion-cuerpo h2 { font-size: clamp(2.25rem, 1.5rem + 3.2vw, 3.75rem); line-height: 1.05; }
+  .declaracion-cuerpo h2 { font-size: clamp(1.875rem, 1.3rem + 2.6vw, 3rem); line-height: 1.1; }
 
+  /* Franja de acento arriba (marca de estado, como en la tabla comparativa
+     y en Privacidad) + borde fino: se integra en el sistema de hairlines en
+     vez de leerse como una tarjeta cerrada de formulario SaaS. */
   .cta-panel {
     display: grid;
     gap: 2rem 3rem;
     grid-template-columns: minmax(14rem, 1fr) minmax(18rem, 1.4fr);
     align-items: start;
-    border: 2px solid var(--color-ink);
-    padding: clamp(2rem, 5vw, 3rem);
+    border: 1px solid var(--color-line);
+    border-block-start: 3px solid var(--color-accent);
+    padding: clamp(1.75rem, 4.5vw, 2.75rem);
   }
   .cta-panel-copy h2 { margin-top: 0.75rem; }
   @media (max-width: 40rem) {
@@ -365,9 +415,9 @@
   .indice dt { display: flex; align-items: baseline; gap: 0.6rem; }
   .indice-num {
     font-family: var(--font-serif);
-    font-size: 0.9375rem;
-    font-weight: 400;
-    color: var(--color-line);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--color-ink-3);
     line-height: 1.3;
   }
 }
