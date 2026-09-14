@@ -113,6 +113,60 @@
   .btn:hover { background: var(--color-accent-strong); border-color: var(--color-accent-strong); }
   .btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
+  /* Refuerzo del CTA (nav, cierres de sección) — enlace con filete, sin el
+     bloque sólido de `.btn`. La conversión real es la sección CTA; esto solo
+     recuerda que existe. Repetir `.btn` cinco veces igualaba el peso de la
+     acción con el de sus recordatorios. */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    color: var(--color-accent);
+    font-weight: 600;
+    text-decoration: none;
+    border-block-end: 1.5px solid var(--color-accent);
+    padding-block-end: 0.15rem;
+  }
+  .btn-ghost:hover { color: var(--color-accent-strong); border-color: var(--color-accent-strong); }
+
+  /* Cabecera — envuelve en vez de partir el texto del enlace de refuerzo por
+     la mitad: en móvil estrecho, la marca y el CTA de nav no caben en la
+     misma línea, así que el CTA baja entero a la suya en vez de partirse
+     palabra a palabra. */
+  .site-header {
+    padding-block: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+    column-gap: 1.5rem;
+  }
+  .site-header .btn-ghost { white-space: nowrap; }
+
+  /* Marca — nombre de lectura en serif + etiqueta de formato en versalitas
+     de sistema, separadas por un filete. Ver 00-identidad-visual.md. */
+  .marca { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; color: var(--color-ink); }
+  .marca-texto {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    font-family: var(--font-serif);
+    font-size: 1.1875rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .marca-formato {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+    border-inline-start: 1px solid var(--color-line);
+    padding-inline-start: 0.55rem;
+  }
+
   a { color: var(--color-accent); }
   a:hover { color: var(--color-accent-strong); }
 
@@ -201,6 +255,49 @@
   }
   .declaracion-cuerpo .lead { margin-inline-start: auto; }
   .declaracion-cuerpo h2 { font-size: clamp(2.25rem, 1.5rem + 3.2vw, 3.75rem); line-height: 1.05; }
+
+  /* Comparativa (control) — cotejo, no dos tarjetas gemelas: la opción
+     descartada se lee fragmentada (columna estrecha, tipografía de sistema,
+     segunda línea corta que la corta en dos) y la elegida se lee como objeto
+     encuadernado (columna ancha, lomo de acento, titular a escala de libro).
+     Eje: framing + escala — ComparativaA varía por marca (marginalia) y la
+     variante B por lista de verificación (linkrow); esta no repite ninguno. */
+  .cotejo {
+    margin-top: 2.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 0.62fr) minmax(0, 1fr);
+    gap: 1rem 2.5rem;
+    align-items: start;
+  }
+  @media (max-width: 40rem) {
+    .cotejo { grid-template-columns: 1fr; gap: 2rem; }
+  }
+  .cotejo-perdida {
+    padding-block-start: 0.35rem;
+    border-block-start: 1px solid var(--color-line);
+  }
+  .cotejo-perdida::after {
+    content: '';
+    display: block;
+    width: 55%;
+    height: 1px;
+    margin-block-start: 1rem;
+    background: var(--color-line);
+  }
+  .cotejo-perdida h3 {
+    font-family: var(--font-sans);
+    font-size: var(--text-small);
+    font-weight: 600;
+    color: var(--color-ink-3);
+  }
+  .cotejo-perdida p { margin-top: 0.5rem; font-size: var(--text-small); color: var(--color-ink-2); }
+  .cotejo-ganada {
+    border-inline-start: 3px solid var(--color-accent);
+    padding-inline-start: 1.75rem;
+    padding-block-start: 0.1rem;
+  }
+  .cotejo-ganada h3 { font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem); }
+  .cotejo-ganada p { margin-top: 0.6rem; color: var(--color-ink-2); }
 
   /* CTA — panel encuadrado de dos columnas: el único momento de la página
      con un marco completo (filete `--ink`, "aquí empieza un bloque nuevo"

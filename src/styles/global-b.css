@@ -128,10 +128,58 @@
   .btn:hover { background: var(--color-accent-strong); border-color: var(--color-accent-strong); }
   .btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
-  /* El CTA de la cabecera comparte franja con el nombre del producto en muy
-     poco ancho: sin esto, la cápsula se parte en dos líneas en móvil
-     estrecho — el estado feo que corresponde a `ux` cubrir. */
-  header .btn { padding: 0.55rem 1rem; font-size: 0.8125rem; }
+  /* Cabecera — mismo criterio que `base.css` del control: el CTA de nav baja
+     entero a su propia línea en móvil estrecho en vez de partirse a mitad
+     de palabra contra la etiqueta de formato de la marca. */
+  .site-header {
+    padding-block: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+    column-gap: 1.5rem;
+  }
+  .site-header .btn-ghost { white-space: nowrap; }
+
+  /* Refuerzo del CTA (nav, cierres de sección) — mismo criterio que
+     `base.css` del control: `.btn` sólido queda para la sección CTA, el
+     resto es un enlace con filete. Ver Header.astro/Faq.astro, compartidos
+     entre control, A y B. */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    color: var(--color-accent);
+    font-weight: 600;
+    text-decoration: none;
+    border-block-end: 1.5px solid var(--color-accent);
+    padding-block-end: 0.15rem;
+  }
+  .btn-ghost:hover { color: var(--color-accent-strong); border-color: var(--color-accent-strong); }
+
+  /* Marca — mismo criterio que `base.css` del control, con la piel propia
+     de esta variante (SF Pro Rounded vía `--font-serif`). */
+  .marca { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; color: var(--color-ink); }
+  .marca-texto {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    font-family: var(--font-serif);
+    font-size: 1.1875rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .marca-formato {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+    border-inline-start: 1px solid var(--color-line);
+    padding-inline-start: 0.55rem;
+  }
 
   a { color: var(--color-accent); }
   a:hover { color: var(--color-accent-strong); }
