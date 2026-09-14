@@ -3,12 +3,12 @@ import WaitlistForm from '../WaitlistForm.astro'
 import { cta } from '../../content/copy'
 ---
 
-<section id="lista-de-espera" class="wrap banda" style="border-radius: var(--radius);">
-  <div style="max-width: 34rem;">
+<section id="lista-de-espera" class="wrap banda cta-panel" style="border-radius: var(--radius);">
+  <div class="cta-panel-copy">
     <p class="eyebrow">Lista de espera</p>
     <h2>{cta.nombre}</h2>
-    <div style="margin-top: 1.5rem;">
-      <WaitlistForm />
-    </div>
+  </div>
+  <div class="cta-panel-form">
+    <WaitlistForm />
   </div>
 </section>

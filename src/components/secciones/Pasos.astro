@@ -6,13 +6,15 @@ import { pasos } from '../../content/copy'
   <p class="eyebrow">Cómo funciona</p>
   <h2>{pasos.nombre}</h2>
 
-  <ol style="margin-top: 2rem; display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); list-style: none; padding: 0;">
+  <ol class="secuencia">
     {
       pasos.lista.map((paso, i) => (
-        <li>
-          <span class="eyebrow" style="color: var(--color-accent);">{`0${i + 1}`}</span>
-          <h3 style="margin-top: 0.4rem;">{paso.titulo}</h3>
-          <p style="margin-top: 0.4rem; color: var(--color-ink-2);">{paso.texto}</p>
+        <li style={`--i: ${i}`}>
+          <span class="secuencia-marca" aria-hidden="true">{`0${i + 1}`}</span>
+          <div>
+            <h3>{paso.titulo}</h3>
+            <p style="margin-top: 0.4rem; color: var(--color-ink-2);">{paso.texto}</p>
+          </div>
         </li>
       ))
     }

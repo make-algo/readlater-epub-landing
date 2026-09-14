@@ -6,11 +6,12 @@ import { faq } from '../../content/copy'
   <p class="eyebrow">FAQ</p>
   <h2>{faq.nombre}</h2>
 
-  <dl style="margin-top: 2rem; display: grid; gap: 1.75rem; max-width: 42rem;">
+  <dl class="indice">
     {
-      faq.preguntas.map((p) => (
-        <div>
+      faq.preguntas.map((p, i) => (
+        <div class="indice-entrada">
           <dt>
+            <span class="indice-num" aria-hidden="true">{`${i + 1}.`}</span>
             <h3>{p.q}</h3>
           </dt>
           <dd style="margin-top: 0.4rem; margin-inline-start: 0; color: var(--color-ink-2);">{p.a}</dd>
