@@ -68,7 +68,7 @@ const INNEGOCIABLES = [
   ['FAQ · precio', '¿Cuánto cuesta?'],
   ['FAQ · precio, respuesta', 'Aún no lo hemos fijado; quien entra en la lista de espera lo sabrá antes que nadie.'],
   ['FAQ · descarga', '¿Cuándo hay descarga?'],
-  ['rótulo del placeholder de la demo', 'Vista previa en lector de escritorio — pendiente sustituir por fotografía de Kindle real'],
+  ['demo · nota de contenido de ejemplo', 'El EPUB de la derecha usa un fichero de ejemplo con contenido de relleno'],
 ]
 
 // El orden en que el argumento tiene que leerse, sección a sección.
@@ -114,10 +114,13 @@ for (const [ruta, fichero] of RUTAS) {
   for (const opcion of ['Sí', 'No', 'Tengo otro e-reader'])
     if (!texto.includes(opcion)) mal(ruta, `falta la opción «${opcion}» de la pregunta Kindle`)
 
-  if (!/data-placeholder="kindle-real-pendiente"/.test(html))
-    mal(ruta, 'la imagen de la demo no lleva el marcador data-placeholder="kindle-real-pendiente"')
-
   if (!/name="_gotcha"/.test(html)) mal(ruta, 'el honeypot del formulario no se llama _gotcha')
+
+  // --- Demo embebida (MAK-101): split-screen accesible con fallback a tabs en móvil.
+  if (!/role="tablist"/.test(html) || !/role="tab"/.test(html) || !/role="tabpanel"/.test(html))
+    mal(ruta, 'la demo no lleva los roles tablist/tab/tabpanel del breakpoint móvil')
+  if (!texto.includes('Web') || !texto.includes('Kindle'))
+    mal(ruta, 'faltan las etiquetas de tab «Web» / «Kindle» de la demo')
 
   const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? ''
   const description = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? ''
@@ -175,6 +178,27 @@ for (const f of [...paginas, ...hojas]) {
 }
 if (terceros.length) fallos.push(`recursos de dominios ajenos: ${terceros.join(', ')}`)
 else console.log(`ok  sin recursos de terceros (${paginas.length} páginas, ${hojas.length} hojas de estilo)`)
+
+// --- Demo embebida (MAK-101): el EPUB de prueba se publica y el lector
+//     carga jszip ANTES que epub.min.js (si no, book.open() se cuelga sin
+//     error — ver docs/design/02-demo-embebida.md en readlater-epub) y
+//     escucha 'openFailed' además de la resolución de book.loaded.navigation.
+if (!existsSync('dist/demo/demo-epub-placeholder.epub'))
+  fallos.push('falta dist/demo/demo-epub-placeholder.epub (el EPUB de prueba de la demo)')
+else console.log('ok  demo · EPUB de prueba publicado en dist/demo/')
+
+const bundleJs = ficheros('dist', '.js')
+const bundleConDemo = bundleJs.filter((f) => readFileSync(f, 'utf8').includes('jszip'))
+if (!bundleConDemo.length) fallos.push('ningún bundle de dist/ carga jszip para la demo')
+else {
+  const texto = bundleConDemo.map((f) => readFileSync(f, 'utf8')).join('\n')
+  const posJszip = texto.indexOf('jszip')
+  const posEpubjs = texto.indexOf('epubjs')
+  if (posEpubjs !== -1 && posJszip > posEpubjs) fallos.push('epub.min.js aparece antes que jszip en el bundle de la demo')
+  if (!texto.includes('openFailed')) fallos.push('el bundle de la demo no escucha el evento openFailed de epub.js')
+  if (!fallos.some((f) => f.includes('jszip') || f.includes('openFailed')))
+    console.log('ok  demo · jszip antes que epub.min.js y openFailed escuchado')
+}
 
 // --- Rutas de todas las variantes publicadas. Solo existe el control por
 //     ahora (MAK-95 es Fase 3; la Fase 4 añade /a/ y /b/ a esta lista).
