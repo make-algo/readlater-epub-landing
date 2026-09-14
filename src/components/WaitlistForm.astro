@@ -1,0 +1,200 @@
+---
+import { absoluteUrl, formEndpoint, url } from '../lib/site'
+import { cta } from '../content/copy'
+
+/**
+ * Lista de espera — único CTA de la landing (`docs/product/00-alcance-landing-v1.md`).
+ *
+ * `<form method="POST">` nativo: sin JavaScript el envío va al proveedor y
+ * este redirige a /gracias. Con JavaScript se intercepta y el estado se
+ * pinta en su sitio sin recargar. El destino vive en `PUBLIC_FORM_ENDPOINT`:
+ * sin endpoint el formulario NO finge — avisa de que el alta no está
+ * operativa y no deja enviar. Ningún secreto en el código: el endpoint es
+ * una URL pública de envío, no una clave.
+ */
+
+const activo = formEndpoint !== ''
+const gracias = absoluteUrl('/gracias')
+---
+
+<form
+  id="waitlist"
+  method="POST"
+  action={activo ? formEndpoint : undefined}
+  novalidate
+  data-activo={activo ? 'si' : 'no'}
+  data-error-correo={cta.email.error}
+  data-boton-reposo={cta.boton.reposo}
+  data-boton-enviando={cta.boton.enviando}
+  data-correo-ejemplo={cta.email.placeholder}
+>
+  <input type="hidden" name="_next" value={gracias} />
+  <input type="hidden" name="_subject" value="Alta en la lista de espera de ReadLater EPUB" />
+
+  <!--
+    Honeypot: fuera de pantalla, sin foco por teclado y oculto al lector. No
+    se usa display:none, que algunos rellenadores detectan. _gotcha es el
+    campo nativo de Formspree.
+  -->
+  <p class="hp" aria-hidden="true">
+    <label>
+      No rellenar
+      <input tabindex="-1" autocomplete="off" name="_gotcha" />
+    </label>
+  </p>
+
+  {
+    !activo && (
+      <p class="notice" id="sin-endpoint" role="status">
+        {cta.sinEndpoint}
+      </p>
+    )
+  }
+
+  <div class="field" id="field-email" style="margin-top: 1rem;">
+    <label for="email">{cta.email.etiqueta}</label>
+    <input
+      id="email"
+      name="email"
+      type="email"
+      required
+      autocomplete="email"
+      inputmode="email"
+      placeholder={cta.email.placeholder}
+      aria-describedby="email-error"
+    />
+    <span class="err" id="email-error" aria-live="polite"></span>
+  </div>
+
+  <fieldset class="field" style="margin-top: 1rem; border: 0; padding: 0;">
+    <legend>{cta.kindle.etiqueta}</legend>
+    <div class="radios" style="margin-top: 0.5rem;">
+      {
+        cta.kindle.opciones.map((opcion, i) => (
+          <label class="radio">
+            <input type="radio" name="kindle" value={opcion} id={i === 0 ? 'kindle-1' : undefined} />
+            {opcion}
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+
+  <div class="alert" id="send-error" role="alert" hidden style="margin-top: 1rem;">
+    {cta.errorEnvio}
+  </div>
+
+  <button class="btn" id="submit" type="submit" disabled={!activo} style="margin-top: 1.25rem;">
+    {cta.boton.reposo}
+  </button>
+
+  <p class="lead" style="margin-top: 1rem; font-size: var(--text-small);">{cta.expectativa}</p>
+</form>
+
+<p class="lead" id="legalnote" style="margin-top: 1.25rem; font-size: var(--text-small);">
+  <strong>{cta.legal.titulo}</strong>{cta.legal.uno}<a href={url('/privacidad')}>{cta.legal.enlace}</a
+  >{cta.legal.dos}<span>{cta.legal.pendiente}</span>{cta.legal.tres}
+</p>
+
+<div id="ok" class="done" role="status" aria-live="polite" tabindex="-1" hidden>
+  <p>{cta.ok.uno}<span id="ok-mail">{cta.email.placeholder}</span>{cta.ok.dos}</p>
+  <p>{cta.ok.extra}</p>
+</div>
+
+<div id="dup" class="done" role="status" aria-live="polite" tabindex="-1" hidden>
+  <p>{cta.duplicado}</p>
+</div>
+
+<script>
+  const form = document.getElementById('waitlist') as HTMLFormElement | null
+  if (form) {
+    const ok = document.getElementById('ok')!
+    const dup = document.getElementById('dup')!
+    const sendError = document.getElementById('send-error')!
+    const emailError = document.getElementById('email-error')!
+    const fieldEmail = document.getElementById('field-email')!
+    const legalnote = document.getElementById('legalnote')!
+    const email = document.getElementById('email') as HTMLInputElement
+    const submit = document.getElementById('submit') as HTMLButtonElement
+    const activo = form.dataset.activo === 'si'
+    const t = form.dataset as Record<string, string>
+
+    type Estado = 'reposo' | 'enviando' | 'error' | 'invalido' | 'exito' | 'duplicado'
+
+    function estado(s: Estado) {
+      const terminado = s === 'exito' || s === 'duplicado'
+      form!.hidden = terminado
+      legalnote.hidden = terminado
+      ok.hidden = s !== 'exito'
+      dup.hidden = s !== 'duplicado'
+      sendError.hidden = s !== 'error'
+
+      const malCorreo = s === 'invalido'
+      fieldEmail.classList.toggle('field--bad', malCorreo)
+      email.setAttribute('aria-invalid', String(malCorreo))
+      emailError.textContent = malCorreo ? t.errorCorreo : ''
+
+      submit.disabled = s === 'enviando' || !activo
+      submit.textContent = s === 'enviando' ? t.botonEnviando : t.botonReposo
+      form!.setAttribute('aria-busy', String(s === 'enviando'))
+
+      if (s === 'exito') {
+        document.getElementById('ok-mail')!.textContent = email.value.trim() || t.correoEjemplo
+        ;(ok as HTMLElement).focus()
+      }
+      if (s === 'duplicado') (dup as HTMLElement).focus()
+    }
+
+    const valido = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
+    let intentado = false
+
+    email.addEventListener('blur', () => {
+      if (!intentado) return
+      const v = email.value.trim()
+      if (v && !valido(v)) estado('invalido')
+    })
+
+    form.addEventListener('submit', async (e) => {
+      intentado = true
+      const v = email.value.trim()
+
+      if (!valido(v)) {
+        e.preventDefault()
+        estado('invalido')
+        email.focus()
+        return
+      }
+
+      email.value = v
+
+      if (!activo) {
+        e.preventDefault()
+        return
+      }
+
+      e.preventDefault()
+      estado('enviando')
+
+      try {
+        const respuesta = await fetch(form!.action, {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: new FormData(form!),
+        })
+
+        if (respuesta.status === 409) estado('duplicado')
+        else if (respuesta.ok) estado('exito')
+        else estado('error')
+      } catch {
+        estado('error')
+      }
+    })
+
+    const pedido = new URLSearchParams(location.search).get('estado')
+    const revisables = ['reposo', 'enviando', 'error', 'invalido', 'exito', 'duplicado']
+    if (pedido && revisables.includes(pedido)) {
+      if (!email.value) email.value = 'ana.martinez@estudio.dev'
+      estado(pedido as Estado)
+    }
+  }
+</script>

@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import { url } from '../lib/site'
+import { cta } from '../content/copy'
+---
+
+<Base title="Ya estás en la lista — ReadLater EPUB" path="/gracias">
+  <Header />
+  <main id="contenido" class="wrap" style="padding-block: 4rem; max-width: 34rem;">
+    <h1 style="font-size: var(--text-h2);">Ya estás en la lista de espera.</h1>
+    <p class="lead" style="margin-top: 1rem;">{cta.expectativa}</p>
+    <p style="margin-top: 1.5rem;"><a href={url('/')}>Volver a la landing</a></p>
+  </main>
+  <Footer />
+</Base>
