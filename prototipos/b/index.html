@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>ReadLater EPUB — de Recordatorios a un libro para tu Kindle</title>
+<meta name="description" content="Los enlaces que guardas en Recordatorios, convertidos en un único EPUB con índice, listo para tu Kindle. Sin cuenta, sin nube: todo ocurre en tu Mac." />
+<style>
+  :root{
+    --paper:#d9d9d3;
+    --paper-dark:#c9c9c2;
+    --ink:#161613;
+    --ink-soft:#4b4b45;
+    --line:#8f8f86;
+    --focus:#161613;
+    --flash-ms:70ms;
+  }
+
+  *{box-sizing:border-box}
+  html,body{
+    margin:0;
+    padding:0;
+    height:100%;
+    overflow:hidden;
+    background:var(--ink);
+  }
+  body{
+    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .skip-link{
+    position:fixed;
+    left:8px;
+    top:-60px;
+    z-index:200;
+    background:var(--ink);
+    color:var(--paper);
+    padding:.6em 1em;
+    font-size:.9rem;
+    text-decoration:none;
+    transition:top .15s;
+  }
+  .skip-link:focus{ top:8px; }
+
+  button, input, a{ font-family:inherit; }
+
+  :focus-visible{
+    outline:3px solid var(--focus);
+    outline-offset:3px;
+  }
+
+  /* ---- frame chrome (persistent, not part of any "screen") ---- */
+  .device-frame{
+    position:fixed;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .chrome-top{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:.6rem 1rem;
+    font-family:"Courier New", ui-monospace, monospace;
+    font-size:.7rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    border-bottom:1px solid var(--line);
+    background:var(--paper);
+  }
+  .chrome-top .wordmark{ color:var(--ink); font-weight:700; }
+  .chrome-top .battery::before{ content:"◧"; margin-right:.4em; }
+
+  .stage{
+    position:relative;
+    flex:1 1 auto;
+    min-height:0;
+  }
+
+  .chrome-bottom{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+    padding:.55rem 1rem;
+    font-family:"Courier New", ui-monospace, monospace;
+    font-size:.72rem;
+    letter-spacing:.04em;
+    color:var(--ink);
+    border-top:1px solid var(--line);
+    background:var(--paper);
+  }
+  .chrome-bottom .status{
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    min-width:0;
+  }
+  .chrome-bottom .status .sep{ margin:0 .5em; color:var(--ink-soft); }
+  .chrome-bottom .toc-open{
+    flex:0 0 auto;
+    background:transparent;
+    border:1px solid var(--ink);
+    color:var(--ink);
+    padding:.35em .8em;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:.72rem;
+    letter-spacing:.04em;
+  }
+  .chrome-bottom .toc-open:hover{ background:var(--ink); color:var(--paper); }
+  .chrome-bottom .hint{
+    color:var(--ink-soft);
+    display:none;
+  }
+  @media (min-width:760px){
+    .chrome-bottom .hint{ display:inline; }
+  }
+
+  /* ---- screens ---- */
+  .screen{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    visibility:hidden;
+    opacity:0;
+    padding:6vh 8vw 4vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:1.4rem;
+  }
+  .screen.is-active{
+    visibility:visible;
+    opacity:1;
+  }
+  .screen-inner{
+    max-width:52rem;
+    margin:0 auto;
+    width:100%;
+  }
+  .screen-eyebrow{
+    font-family:"Courier New", ui-monospace, monospace;
+    font-size:.75rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:0 0 .9em;
+  }
+  .screen h1, .screen h2{
+    font-weight:700;
+    line-height:1.08;
+    margin:0 0 .5em;
+    letter-spacing:-.01em;
+  }
+  .screen h1{ font-size:clamp(2rem, 5.4vw, 3.6rem); }
+  .screen h2{ font-size:clamp(1.5rem, 3.6vw, 2.3rem); }
+  .screen p{
+    font-size:clamp(1rem, 1.6vw, 1.2rem);
+    line-height:1.5;
+    max-width:38rem;
+    color:var(--ink);
+  }
+  .screen p.lede{ font-size:clamp(1.1rem, 2vw, 1.35rem); }
+
+  .btn{
+    display:inline-block;
+    background:var(--ink);
+    color:var(--paper);
+    border:1px solid var(--ink);
+    padding:.8em 1.4em;
+    font-size:1rem;
+    font-weight:700;
+    cursor:pointer;
+    text-decoration:none;
+    letter-spacing:.01em;
+  }
+  .btn:hover{ background:var(--paper); color:var(--ink); }
+  .btn-ghost{
+    background:transparent;
+    color:var(--ink);
+  }
+  .btn-ghost:hover{ background:var(--ink); color:var(--paper); }
+
+  /* hero */
+  #screen-0 .cta-row{ display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap; margin-top:.6rem; }
+  #screen-0 .turn-hint{ font-family:"Courier New", ui-monospace, monospace; font-size:.8rem; color:var(--ink-soft); }
+
+  /* pasos */
+  .pasos-list{ list-style:none; margin:0; padding:0; display:grid; gap:1.1rem; }
+  .pasos-list li{ display:flex; gap:1rem; align-items:baseline; border-top:1px solid var(--line); padding-top:.8rem; }
+  .pasos-list .n{ font-family:"Courier New", ui-monospace, monospace; font-size:1rem; color:var(--ink-soft); flex:0 0 2ch; }
+  .pasos-list strong{ display:block; font-size:1.1rem; }
+  .pasos-list span{ display:block; color:var(--ink-soft); font-size:.95rem; }
+
+  /* comparativa */
+  .comp-grid{ display:grid; gap:1.4rem; grid-template-columns:1fr 1fr; margin:1rem 0; }
+  @media (max-width:640px){ .comp-grid{ grid-template-columns:1fr; } }
+  .comp-card{ border:1px solid var(--line); padding:1.1rem; }
+  .comp-card h3{ margin:0 0 .5em; font-size:1.05rem; }
+  .comp-card p{ font-size:.95rem; margin:0; }
+  .comp-card.win{ border:2px solid var(--ink); }
+  .comp-otros{ font-size:.9rem; color:var(--ink-soft); border-top:1px dashed var(--line); padding-top:1rem; }
+
+  /* faq */
+  .faq-list{ margin:0; padding:0; display:grid; gap:.9rem; }
+  .faq-item{ border-top:1px solid var(--line); padding-top:.7rem; }
+  .faq-item h3{ margin:0 0 .3em; font-size:1.02rem; }
+  .faq-item p{ margin:0; font-size:.92rem; color:var(--ink-soft); max-width:none; }
+
+  /* demo */
+  .demo-tabs{ display:flex; gap:.5rem; margin-bottom:.9rem; }
+  .demo-tab{
+    border:1px solid var(--ink);
+    background:transparent;
+    color:var(--ink);
+    padding:.4em .9em;
+    font-size:.85rem;
+    cursor:pointer;
+    font-family:"Courier New", ui-monospace, monospace;
+  }
+  .demo-tab[aria-selected="true"]{ background:var(--ink); color:var(--paper); }
+  .demo-panels{ position:relative; border:1px solid var(--line); min-height:min(44vh, 320px); }
+  .demo-panel{ display:none; padding:1rem; }
+  .demo-panel.is-shown{ display:block; }
+  .demo-panel img{ max-width:100%; display:block; margin:0 auto; filter:grayscale(1) contrast(1.05); }
+  .demo-caption{ font-size:.78rem; color:var(--ink-soft); margin-top:.6rem; text-align:center; }
+  #epub-viewer{ height:min(34vh, 260px); border:1px solid var(--line); background:#efefe9; }
+  .epub-toc{ list-style:none; margin:.8rem 0 0; padding:0; display:flex; flex-wrap:wrap; gap:.5rem; }
+  .epub-toc button{
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--ink);
+    padding:.3em .6em;
+    font-size:.75rem;
+    cursor:pointer;
+  }
+  .epub-toc button[aria-current="true"]{ border-color:var(--ink); font-weight:700; }
+  .epub-nav{ display:flex; gap:.5rem; margin-top:.6rem; }
+  .epub-nav button{ border:1px solid var(--ink); background:transparent; color:var(--ink); padding:.3em .8em; cursor:pointer; font-size:.8rem; }
+  .demo-note{ font-size:.78rem; color:var(--ink-soft); margin-top:.7rem; }
+  .epub-error{ font-size:.9rem; color:var(--ink-soft); }
+
+  /* cta / formulario */
+  .cta-form{ display:grid; gap:1rem; max-width:30rem; }
+  .field{ display:grid; gap:.35rem; }
+  .field label{ font-size:.85rem; font-weight:700; }
+  .field input[type="email"]{
+    border:1px solid var(--ink);
+    background:var(--paper);
+    color:var(--ink);
+    padding:.7em .8em;
+    font-size:1rem;
+  }
+  .field .err{ font-size:.8rem; color:var(--ink-soft); display:none; }
+  .field.has-error .err{ display:block; }
+  .field.has-error input{ border-width:2px; }
+  fieldset{ border:1px solid var(--line); padding:.8rem; display:grid; gap:.4rem; }
+  fieldset legend{ font-size:.85rem; font-weight:700; padding:0 .3em; }
+  .radio-row{ display:flex; gap:1.2rem; flex-wrap:wrap; }
+  .radio-row label{ display:flex; align-items:center; gap:.4em; font-size:.92rem; }
+  .honeypot{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+  .cta-legal{ font-size:.75rem; color:var(--ink-soft); max-width:34rem; }
+  .cta-legal a{ color:var(--ink); }
+  .cta-result{ font-size:.95rem; border-top:1px solid var(--line); padding-top:.8rem; display:none; }
+  .cta-result.is-shown{ display:block; }
+  #screen-7 .screen-inner{ max-width:44rem; }
+
+  /* ---- e-ink flash + ghost ---- */
+  .flash-overlay{
+    position:fixed;
+    inset:0;
+    z-index:150;
+    pointer-events:none;
+    opacity:0;
+    background:#000;
+  }
+  .flash-overlay.f-black{ opacity:1; background:#000; transition:none; }
+  .flash-overlay.f-white{ opacity:1; background:#fff; transition:none; }
+  .flash-overlay.f-clear{ opacity:0; transition:opacity var(--flash-ms) linear; }
+
+  .ghost-layer{
+    position:fixed;
+    inset:0;
+    z-index:120;
+    pointer-events:none;
+    mix-blend-mode:multiply;
+    filter:blur(.3px);
+  }
+  .ghost-layer .ghost-shot{
+    position:absolute;
+    inset:0;
+    opacity:0;
+  }
+  .ghost-layer .ghost-shot.is-in{ opacity:.16; transition:opacity 4200ms ease-out; }
+  .ghost-layer .ghost-shot.is-fading{ opacity:.02; }
+  .reduced-motion .ghost-layer .ghost-shot{ transition:none !important; opacity:.11 !important; }
+
+  /* ---- TOC dialog ---- */
+  .toc-dialog{
+    position:fixed;
+    inset:0;
+    z-index:180;
+    display:none;
+    background:rgba(22,22,19,.86);
+    align-items:center;
+    justify-content:center;
+    padding:6vh 6vw;
+  }
+  .toc-dialog.is-open{ display:flex; }
+  .toc-panel{
+    background:var(--paper);
+    color:var(--ink);
+    border:1px solid var(--ink);
+    max-width:34rem;
+    width:100%;
+    max-height:80vh;
+    overflow:auto;
+    padding:1.4rem;
+  }
+  .toc-panel h2{ margin:0 0 .2em; font-size:1.1rem; }
+  .toc-panel .toc-sub{ font-family:"Courier New", ui-monospace, monospace; font-size:.72rem; color:var(--ink-soft); margin:0 0 1em; text-transform:uppercase; letter-spacing:.08em; }
+  .toc-panel ol{ list-style:none; margin:0; padding:0; display:grid; gap:.1rem; }
+  .toc-panel li{ border-top:1px solid var(--line); }
+  .toc-panel li:first-child{ border-top:none; }
+  .toc-panel button{
+    width:100%;
+    text-align:left;
+    background:transparent;
+    border:0;
+    color:var(--ink);
+    padding:.65em .3em;
+    font-size:1rem;
+    cursor:pointer;
+    display:flex;
+    justify-content:space-between;
+    gap:1rem;
+  }
+  .toc-panel button:hover{ background:rgba(22,22,19,.08); }
+  .toc-panel button[aria-current="true"]{ font-weight:700; }
+  .toc-panel button .idx{ font-family:"Courier New", ui-monospace, monospace; color:var(--ink-soft); font-size:.85rem; }
+  .toc-close{
+    margin-top:1rem;
+    border:1px solid var(--ink);
+    background:transparent;
+    color:var(--ink);
+    padding:.5em 1em;
+    cursor:pointer;
+  }
+
+  /* ---- edge tap zones (desktop hint only, functional everywhere) ---- */
+  .edge-zone{
+    position:absolute;
+    top:0; bottom:0;
+    width:14%;
+    z-index:60;
+    background:transparent;
+    border:0;
+    cursor:pointer;
+    padding:0;
+  }
+  .edge-zone.prev{ left:0; }
+  .edge-zone.next{ right:0; }
+  .edge-zone:focus-visible{ outline-offset:-4px; }
+
+  /* ---- screensaver ---- */
+  .screensaver{
+    position:fixed;
+    inset:0;
+    z-index:170;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:var(--paper);
+    text-align:center;
+    padding:2rem;
+  }
+  .screensaver.is-shown{ display:flex; }
+  .cover-card{ max-width:22rem; }
+  .cover-card .cover-rule{ width:2.4rem; height:2px; background:var(--ink); margin:0 auto 1.1rem; }
+  .cover-card h2{ font-size:1.7rem; margin:0 0 .3em; line-height:1.12; }
+  .cover-card p{ font-size:.85rem; color:var(--ink-soft); margin:0 auto; max-width:20rem; }
+  .cover-card .cover-foot{ margin-top:1.6rem; font-family:"Courier New", ui-monospace, monospace; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); }
+
+  .sr-only{
+    position:absolute;
+    width:1px; height:1px;
+    overflow:hidden;
+    clip:rect(0 0 0 0);
+    white-space:nowrap;
+  }
+
+  @media (max-width:640px){
+    .screen{ padding:9vh 7vw 5vh; }
+    .chrome-bottom .status{ font-size:.68rem; }
+  }
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Saltar al contenido</a>
+
+<div class="flash-overlay" id="flashOverlay" aria-hidden="true"></div>
+<div class="ghost-layer" id="ghostLayer" aria-hidden="true"></div>
+
+<div class="device-frame">
+  <header class="chrome-top">
+    <span class="wordmark">ReadLater EPUB</span>
+    <span class="battery">e-ink · sin conexión</span>
+  </header>
+
+  <main id="main" class="stage" tabindex="-1">
+
+    <button type="button" class="edge-zone prev" id="edgePrev" aria-label="Pantalla anterior"></button>
+    <button type="button" class="edge-zone next" id="edgeNext" aria-label="Pantalla siguiente"></button>
+
+    <!-- 0. HERO -->
+    <section class="screen" id="screen-0" data-title="Portada">
+      <div class="screen-inner">
+        <p class="screen-eyebrow">ReadLater EPUB</p>
+        <h1 tabindex="-1">Los enlaces que guardas en Recordatorios, convertidos en un libro con índice para tu Kindle.</h1>
+        <p class="lede">ReadLater EPUB junta lo que acumulas en Recordatorios y genera un único EPUB navegable — sin cuenta, sin nube, sin mandarlos uno a uno.</p>
+        <div class="cta-row">
+          <button type="button" class="btn" data-jump="7">Entra en la lista de espera</button>
+          <span class="turn-hint">→ pasa la página para ver cómo llega a tu Kindle</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. DEMO -->
+    <section class="screen" id="screen-1" data-title="Así llega a tu Kindle">
+      <div class="screen-inner">
+        <h2 tabindex="-1">Así llega a tu Kindle</h2>
+        <p>El resultado no son artículos sueltos: es un único EPUB con índice, navegable como un libro.</p>
+
+        <div class="demo-tabs" role="tablist" aria-label="Comparar web original y EPUB generado">
+          <button type="button" class="demo-tab" id="tabWeb" role="tab" aria-selected="true" aria-controls="panelWeb">Web</button>
+          <button type="button" class="demo-tab" id="tabEpub" role="tab" aria-selected="false" aria-controls="panelEpub">Kindle</button>
+        </div>
+
+        <div class="demo-panels">
+          <div class="demo-panel is-shown" id="panelWeb" role="tabpanel" aria-labelledby="tabWeb">
+            <img src="./fallback-web-static.png" alt="Captura estática de la web original del artículo" />
+            <p class="demo-caption">Web original — Vista estática — el sitio original no permite embebido en vivo</p>
+          </div>
+          <div class="demo-panel" id="panelEpub" role="tabpanel" aria-labelledby="tabEpub" hidden>
+            <div id="epub-viewer" aria-label="Lector del EPUB generado"></div>
+            <nav class="epub-nav" aria-label="Pasar página dentro del EPUB de muestra">
+              <button type="button" id="epubPrev">‹ anterior</button>
+              <button type="button" id="epubNext">siguiente ›</button>
+            </nav>
+            <ol class="epub-toc" id="epubToc" aria-label="readlater · índice navegable"></ol>
+            <p class="demo-caption" id="epubStatus">EPUB generado — readlater · índice navegable</p>
+          </div>
+        </div>
+
+        <p class="demo-note">El EPUB de la derecha usa un fichero de ejemplo con contenido de relleno — se sustituye por el que genera la propia app en cuanto esté disponible.</p>
+      </div>
+    </section>
+
+    <!-- 2. PASOS -->
+    <section class="screen" id="screen-2" data-title="Tres pasos, cero apps nuevas">
+      <div class="screen-inner">
+        <h2 tabindex="-1">Tres pasos, cero apps nuevas</h2>
+        <ol class="pasos-list">
+          <li><span class="n">01</span><span><strong>Compartir → Recordatorios.</strong><span>Desde Safari o cualquier app, el gesto de compartir que ya usas.</span></span></li>
+          <li><span class="n">02</span><span><strong>Abrir ReadLater EPUB.</strong><span>Un clic en el Mac, sin login.</span></span></li>
+          <li><span class="n">03</span><span><strong>EPUB en tu Kindle.</strong><span>Arrastra o envía el fichero — no hay paso de nube intermedio.</span></span></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 3. COMPARATIVA -->
+    <section class="screen" id="screen-3" data-title="¿Y por qué no uso ya Send to Kindle?">
+      <div class="screen-inner">
+        <h2 tabindex="-1">¿Y por qué no uso ya Send to Kindle?</h2>
+        <div class="comp-grid">
+          <div class="comp-card">
+            <h3>Send to Kindle</h3>
+            <p>Un documento por artículo, sin índice entre ellos, y hay que acordarse en el momento de leer el enlace.</p>
+          </div>
+          <div class="comp-card win">
+            <h3>ReadLater EPUB</h3>
+            <p>La semana acumulada en Recordatorios se convierte en un solo documento navegable, sin depender de acordarte al momento.</p>
+          </div>
+        </div>
+        <p class="comp-otros">Instapaper, Readwise y Matter son servicios en la nube con cuenta y, casi todos, con suscripción. ReadLater EPUB no pide cuenta porque no hay servidor que mantener.</p>
+      </div>
+    </section>
+
+    <!-- 4. PRIVACIDAD -->
+    <section class="screen" id="screen-4" data-title="Se queda en tu Mac">
+      <div class="screen-inner">
+        <h2 tabindex="-1">Se queda en tu Mac</h2>
+        <p class="lede">Todo ocurre en tu Mac. Sin cuenta, sin servidor propio, sin sincronización en la nube — lo único que sale del dispositivo es el artículo que ya pediste leer.</p>
+      </div>
+    </section>
+
+    <!-- 5. FAQ (1/2) -->
+    <section class="screen" id="screen-5" data-title="Preguntas antes de apuntarte — 1/2">
+      <div class="screen-inner">
+        <h2 tabindex="-1">Preguntas antes de apuntarte</h2>
+        <div class="faq-list">
+          <div class="faq-item">
+            <h3>¿Por qué no uso directamente Send to Kindle?</h3>
+            <p>Send to Kindle manda un documento por artículo, sin índice ni relación entre ellos, y exige acordarte en el momento de leer el enlace. ReadLater EPUB junta lo acumulado en un solo documento navegable.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Por qué no Instapaper/Readwise/Matter, que ya hacen de todo?</h3>
+            <p>Todos son servicios en la nube con cuenta y casi todos por suscripción; ReadLater EPUB no pide cuenta ni tiene coste recurrente porque no hay servidor que mantener. Si ya estás contento pagando por búsqueda de texto completo, resúmenes con IA o sincronía multi-dispositivo, no es para ti — es para quien solo quiere que lo guardado en el móvil llegue limpio y agrupado al Kindle.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Y si no tengo Mac, o no lo enciendo a diario?</h3>
+            <p>Límite real y sin resolver: el EPUB se genera al abrir la app en el Mac, no en segundo plano ni desde el móvil.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. FAQ (2/2) -->
+    <section class="screen" id="screen-6" data-title="Preguntas antes de apuntarte — 2/2">
+      <div class="screen-inner">
+        <h2 tabindex="-1">Preguntas antes de apuntarte</h2>
+        <div class="faq-list">
+          <div class="faq-item">
+            <h3>¿Cuánto cuesta?</h3>
+            <p>Aún no lo hemos fijado; quien entra en la lista de espera lo sabrá antes que nadie.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Cuándo hay descarga?</h3>
+            <p>Todavía no hay descarga pública: la build actual no está firmada para distribución fuera de este equipo. Quien entra en la lista de espera es de los primeros en probar la beta privada en cuanto esté firmada y notarizada.</p>
+          </div>
+        </div>
+        <div class="cta-row" style="margin-top:.6rem">
+          <button type="button" class="btn" data-jump="7">Entra en la lista de espera</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. CTA / FORMULARIO -->
+    <section class="screen" id="screen-7" data-title="Entra en la lista de espera">
+      <div class="screen-inner">
+        <p class="screen-eyebrow">Fin del documento</p>
+        <h2 tabindex="-1">Entra en la lista de espera</h2>
+        <p>Todavía no hay descarga pública.</p>
+        <p>Todavía no hay descarga pública: la build actual no está firmada para distribución fuera de este equipo. Quien entra en la lista de espera es de los primeros en probar la beta privada en cuanto esté firmada y notarizada, y antes que nadie sabrá el precio cuando se fije. Sin spam, sin más de un email al mes.</p>
+
+        <form class="cta-form" id="waitlistForm" novalidate>
+          <div class="field" id="emailField">
+            <label for="email">Correo</label>
+            <input type="email" id="email" name="email" placeholder="tú@ejemplo.com" required autocomplete="email" />
+            <span class="err" id="emailErr">Escribe un correo con formato válido.</span>
+          </div>
+
+          <div class="honeypot" aria-hidden="true">
+            <label for="empresa">No rellenar este campo</label>
+            <input type="text" id="empresa" name="empresa" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <fieldset>
+            <legend>¿Tienes Kindle?</legend>
+            <div class="radio-row">
+              <label><input type="radio" name="kindle" value="Sí" checked /> Sí</label>
+              <label><input type="radio" name="kindle" value="No" /> No</label>
+              <label><input type="radio" name="kindle" value="Tengo otro e-reader" /> Tengo otro e-reader</label>
+            </div>
+          </fieldset>
+
+          <button type="submit" class="btn" id="ctaSubmit">Entra en la lista de espera</button>
+
+          <p class="cta-result" id="ctaResult" role="status"></p>
+
+          <p class="cta-legal">
+            <strong>Protección de datos. </strong>Tu correo se usa solo para avisarte de la beta privada. Más detalle en la <a href="../../privacidad">política de privacidad</a>. Responsable: Make Algo SL. Proveedor de envío del formulario: Formspree.
+          </p>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="chrome-bottom">
+    <span class="status" id="statusBar" aria-live="polite">Pantalla 1 de 7<span class="sep">·</span>14% leído</span>
+    <span class="hint">↑↓ / rueda / borde / swipe para pasar página</span>
+    <button type="button" class="toc-open" id="tocOpenBtn" aria-haspopup="dialog" aria-controls="tocDialog">Índice ☰</button>
+  </footer>
+</div>
+
+<div class="screensaver" id="screensaver" aria-hidden="true">
+  <div class="cover-card">
+    <div class="cover-rule"></div>
+    <h2>El EPUB de esta semana</h2>
+    <p>Lo acumulado en Recordatorios, listo para abrirse. Toca, mueve el ratón o pulsa una tecla para volver a la lista de espera.</p>
+    <p class="cover-foot">ReadLater EPUB · en reposo</p>
+  </div>
+</div>
+
+<div class="toc-dialog" id="tocDialog" role="dialog" aria-modal="true" aria-labelledby="tocHeading">
+  <div class="toc-panel">
+    <h2 id="tocHeading">Índice</h2>
+    <p class="toc-sub">readlater · índice navegable</p>
+    <ol id="tocList"></ol>
+    <button type="button" class="toc-close" id="tocCloseBtn">Cerrar</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var screens = Array.prototype.slice.call(document.querySelectorAll(".screen"));
+  var total = screens.length;
+  var current = 0;
+  var animating = false;
+
+  var stage = document.getElementById("main");
+  var flashOverlay = document.getElementById("flashOverlay");
+  var ghostLayer = document.getElementById("ghostLayer");
+  var statusBar = document.getElementById("statusBar");
+  var tocDialog = document.getElementById("tocDialog");
+  var tocList = document.getElementById("tocList");
+  var tocOpenBtn = document.getElementById("tocOpenBtn");
+  var tocCloseBtn = document.getElementById("tocCloseBtn");
+  var screensaver = document.getElementById("screensaver");
+
+  var reducedMotionMQ = window.matchMedia("(prefers-reduced-motion: reduce)");
+  function reduced(){ return reducedMotionMQ.matches; }
+
+  document.documentElement.classList.toggle("reduced-motion", reduced());
+  reducedMotionMQ.addEventListener && reducedMotionMQ.addEventListener("change", function(){
+    document.documentElement.classList.toggle("reduced-motion", reduced());
+  });
+
+  // ---------- TOC build ----------
+  screens.forEach(function(s, i){
+    var li = document.createElement("li");
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.setAttribute("aria-current", i === current ? "true" : "false");
+    var idx = document.createElement("span");
+    idx.className = "idx";
+    idx.textContent = String(i + 1).padStart(2, "0");
+    var label = document.createElement("span");
+    label.textContent = s.dataset.title;
+    btn.appendChild(label);
+    btn.appendChild(idx);
+    btn.addEventListener("click", function(){ closeToc(); goTo(i); });
+    li.appendChild(btn);
+    tocList.appendChild(li);
+  });
+
+  function updateStatus(){
+    var pct = Math.round(((current + 1) / total) * 100);
+    var label = "Pantalla " + (current + 1) + " de " + total;
+    statusBar.textContent = label + " · " + pct + "% leído" + (current === total - 1 ? " · fin del documento" : "");
+    Array.prototype.forEach.call(tocList.querySelectorAll("button"), function(b, i){
+      b.setAttribute("aria-current", i === current ? "true" : "false");
+    });
+  }
+
+  // ---------- ghosting ----------
+  function pushGhost(fromScreen){
+    var clone = fromScreen.cloneNode(true);
+    clone.removeAttribute("id");
+    clone.classList.remove("is-active");
+    clone.classList.add("ghost-shot");
+    clone.style.visibility = "visible";
+    clone.style.opacity = "";
+    clone.setAttribute("aria-hidden", "true");
+    clone.querySelectorAll("[id]").forEach(function(el){ el.removeAttribute("id"); });
+    clone.querySelectorAll("input,button,a,textarea,select").forEach(function(el){
+      el.setAttribute("tabindex", "-1");
+      el.disabled = true;
+    });
+
+    var existing = ghostLayer.querySelectorAll(".ghost-shot");
+    if (existing.length > 1) existing[0].remove();
+
+    ghostLayer.appendChild(clone);
+    requestAnimationFrame(function(){
+      clone.classList.add("is-in");
+    });
+
+    if (!reduced()){
+      setTimeout(function(){ clone.classList.add("is-fading"); }, 300);
+      setTimeout(function(){ clone.remove(); }, 4600);
+    } else {
+      setTimeout(function(){ clone.remove(); }, 1800);
+    }
+  }
+
+  function clearGhosts(){
+    ghostLayer.querySelectorAll(".ghost-shot").forEach(function(g){ g.remove(); });
+  }
+
+  // ---------- flash sequence ----------
+  function flashThenSwap(swapFn, doneFn){
+    if (reduced()){
+      swapFn();
+      if (doneFn) doneFn();
+      return;
+    }
+    flashOverlay.className = "flash-overlay f-black";
+    setTimeout(function(){
+      flashOverlay.className = "flash-overlay f-white";
+      swapFn();
+      setTimeout(function(){
+        flashOverlay.className = "flash-overlay f-black";
+        setTimeout(function(){
+          flashOverlay.className = "flash-overlay f-clear";
+          setTimeout(function(){ if (doneFn) doneFn(); }, 90);
+        }, 55);
+      }, 65);
+    }, 60);
+  }
+
+  // ---------- page turn ----------
+  function goTo(index){
+    if (animating) return;
+    index = Math.max(0, Math.min(total - 1, index));
+    if (index === current) return;
+    animating = true;
+    dismissScreensaver(true);
+
+    var from = screens[current];
+    var to = screens[index];
+
+    flashThenSwap(function(){
+      pushGhost(from);
+      from.classList.remove("is-active");
+      from.setAttribute("inert", "");
+      from.setAttribute("aria-hidden", "true");
+      to.classList.add("is-active");
+      to.removeAttribute("inert");
+      to.removeAttribute("aria-hidden");
+      current = index;
+      updateStatus();
+    }, function(){
+      animating = false;
+      var heading = to.querySelector("h1, h2");
+      if (heading) heading.focus({ preventScroll: true });
+      resetIdleTimers();
+    });
+  }
+
+  function next(){ if (current < total - 1) goTo(current + 1); }
+  function prev(){ if (current > 0) goTo(current - 1); }
+
+  // init screen state
+  screens.forEach(function(s, i){
+    if (i === 0){
+      s.classList.add("is-active");
+    } else {
+      s.setAttribute("inert", "");
+      s.setAttribute("aria-hidden", "true");
+    }
+  });
+  updateStatus();
+
+  // ---------- input: keyboard ----------
+  document.addEventListener("keydown", function(e){
+    if (tocDialog.classList.contains("is-open")){
+      if (e.key === "Escape"){ closeToc(); }
+      return;
+    }
+    var tag = (e.target && e.target.tagName) || "";
+    var typing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+
+    if (screensaver.classList.contains("is-shown")){
+      dismissScreensaver();
+      return;
+    }
+
+    if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === "PageDown" || (e.key === " " && !typing)){
+      e.preventDefault();
+      next();
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp" || e.key === "PageUp"){
+      e.preventDefault();
+      prev();
+    } else if (e.key === "i" && !typing){
+      openToc();
+    }
+    resetIdleTimers();
+  });
+
+  // ---------- input: wheel ----------
+  var wheelCooldown = false;
+  stage.addEventListener("wheel", function(e){
+    if (Math.abs(e.deltaY) < 12) return;
+    if (wheelCooldown) return;
+    wheelCooldown = true;
+    setTimeout(function(){ wheelCooldown = false; }, 520);
+    if (screensaver.classList.contains("is-shown")){ dismissScreensaver(); return; }
+    if (e.deltaY > 0) next(); else prev();
+    resetIdleTimers();
+  }, { passive: true });
+
+  // ---------- input: edge taps ----------
+  document.getElementById("edgePrev").addEventListener("click", function(){
+    if (screensaver.classList.contains("is-shown")){ dismissScreensaver(); return; }
+    prev(); resetIdleTimers();
+  });
+  document.getElementById("edgeNext").addEventListener("click", function(){
+    if (screensaver.classList.contains("is-shown")){ dismissScreensaver(); return; }
+    next(); resetIdleTimers();
+  });
+
+  // ---------- input: swipe ----------
+  var touchStartX = null, touchStartY = null;
+  stage.addEventListener("touchstart", function(e){
+    if (!e.touches || e.touches.length !== 1) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  stage.addEventListener("touchend", function(e){
+    if (touchStartX === null) return;
+    var t = e.changedTouches && e.changedTouches[0];
+    if (!t) return;
+    var dx = t.clientX - touchStartX;
+    var dy = t.clientY - touchStartY;
+    touchStartX = null; touchStartY = null;
+    if (Math.abs(dx) < 46 || Math.abs(dx) < Math.abs(dy)) return;
+    if (screensaver.classList.contains("is-shown")){ dismissScreensaver(); return; }
+    if (dx < 0) next(); else prev();
+    resetIdleTimers();
+  }, { passive: true });
+
+  // ---------- jump buttons (hero / faq cta) ----------
+  document.querySelectorAll("[data-jump]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      goTo(parseInt(btn.dataset.jump, 10));
+    });
+  });
+
+  // ---------- TOC dialog ----------
+  var lastFocused = null;
+  function openToc(){
+    lastFocused = document.activeElement;
+    tocDialog.classList.add("is-open");
+    var first = tocList.querySelector("button");
+    if (first) first.focus();
+  }
+  function closeToc(){
+    tocDialog.classList.remove("is-open");
+    if (lastFocused && lastFocused.focus) lastFocused.focus();
+  }
+  tocOpenBtn.addEventListener("click", openToc);
+  tocCloseBtn.addEventListener("click", closeToc);
+  tocDialog.addEventListener("click", function(e){
+    if (e.target === tocDialog) closeToc();
+  });
+  tocDialog.addEventListener("keydown", function(e){
+    if (e.key !== "Tab") return;
+    var focusables = tocDialog.querySelectorAll("button");
+    var list = Array.prototype.slice.call(focusables);
+    var idx = list.indexOf(document.activeElement);
+    if (e.shiftKey && idx === 0){ e.preventDefault(); list[list.length - 1].focus(); }
+    else if (!e.shiftKey && idx === list.length - 1){ e.preventDefault(); list[0].focus(); }
+  });
+
+  // ---------- idle: spontaneous refresh + screensaver ----------
+  var refreshTimer = null, sleepTimer = null;
+  var REFRESH_AFTER = 22000;
+  var SLEEP_AFTER = 65000;
+
+  function spontaneousRefresh(){
+    if (animating || screensaver.classList.contains("is-shown")) return;
+    if (reduced()) { clearGhosts(); return; }
+    animating = true;
+    flashThenSwap(function(){ clearGhosts(); }, function(){ animating = false; });
+  }
+
+  function showScreensaver(){
+    screensaver.classList.add("is-shown");
+    screensaver.setAttribute("aria-hidden", "false");
+    stage.setAttribute("inert", "");
+  }
+
+  function dismissScreensaver(silent){
+    if (!screensaver.classList.contains("is-shown")) return;
+    screensaver.classList.remove("is-shown");
+    screensaver.setAttribute("aria-hidden", "true");
+    stage.removeAttribute("inert");
+    if (!silent && !reduced()){
+      flashOverlay.className = "flash-overlay f-black";
+      setTimeout(function(){ flashOverlay.className = "flash-overlay f-clear"; }, 70);
+    }
+  }
+
+  function resetIdleTimers(){
+    clearTimeout(refreshTimer);
+    clearTimeout(sleepTimer);
+    refreshTimer = setTimeout(spontaneousRefresh, REFRESH_AFTER);
+    sleepTimer = setTimeout(showScreensaver, SLEEP_AFTER);
+  }
+  resetIdleTimers();
+
+  ["mousedown", "keydown", "touchstart", "wheel"].forEach(function(ev){
+    document.addEventListener(ev, function(){
+      if (!screensaver.classList.contains("is-shown")) resetIdleTimers();
+    }, { passive: true });
+  });
+  screensaver.addEventListener("click", function(){ dismissScreensaver(); resetIdleTimers(); });
+  screensaver.addEventListener("touchstart", function(){ dismissScreensaver(); resetIdleTimers(); }, { passive: true });
+
+  // ---------- demo tabs ----------
+  var tabWeb = document.getElementById("tabWeb");
+  var tabEpub = document.getElementById("tabEpub");
+  var panelWeb = document.getElementById("panelWeb");
+  var panelEpub = document.getElementById("panelEpub");
+  var epubLoaded = false;
+
+  function selectTab(which){
+    var web = which === "web";
+    tabWeb.setAttribute("aria-selected", web ? "true" : "false");
+    tabEpub.setAttribute("aria-selected", web ? "false" : "true");
+    panelWeb.hidden = !web;
+    panelEpub.hidden = web;
+    panelWeb.classList.toggle("is-shown", web);
+    panelEpub.classList.toggle("is-shown", !web);
+    if (!web && !epubLoaded){ loadEpub(); }
+  }
+  tabWeb.addEventListener("click", function(){ selectTab("web"); });
+  tabEpub.addEventListener("click", function(){ selectTab("epub"); });
+
+  // ---------- real EPUB render (epub.js) ----------
+  function loadEpub(){
+    epubLoaded = true;
+    var viewerEl = document.getElementById("epub-viewer");
+    var statusEl = document.getElementById("epubStatus");
+    var tocEl = document.getElementById("epubToc");
+
+    var settled = false;
+    function fail(){
+      if (settled) return;
+      settled = true;
+      viewerEl.innerHTML = '<p class="epub-error">No se ha podido cargar la vista previa del EPUB.</p>';
+    }
+    function succeed(){ settled = true; }
+    setTimeout(fail, 4000);
+
+    function withScript(src, cb){
+      var s = document.createElement("script");
+      s.src = src;
+      s.onload = cb;
+      s.onerror = fail;
+      document.head.appendChild(s);
+    }
+
+    try {
+      withScript("https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js", function(){
+        withScript("https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js", function(){
+          try {
+            var book = ePub("./demo-epub-placeholder.epub");
+            book.opened.catch(fail);
+            var rendition = book.renderTo(viewerEl, { width: "100%", height: "100%", flow: "paginated" });
+            rendition.display().catch(fail);
+            document.getElementById("epubPrev").addEventListener("click", function(){ rendition.prev(); });
+            document.getElementById("epubNext").addEventListener("click", function(){ rendition.next(); });
+            book.loaded.navigation.then(function(nav){
+              (nav.toc || []).forEach(function(item){
+                var li = document.createElement("li");
+                var b = document.createElement("button");
+                b.type = "button";
+                b.textContent = item.label ? item.label.trim() : item.href;
+                b.addEventListener("click", function(){ rendition.display(item.href); });
+                li.appendChild(b);
+                tocEl.appendChild(li);
+              });
+            }).catch(function(){});
+            rendition.on("rendered", function(){
+              succeed();
+              statusEl.textContent = "EPUB generado — readlater · índice navegable";
+            });
+          } catch (err){
+            fail();
+          }
+        });
+      });
+    } catch (err){
+      fail();
+    }
+  }
+
+  // ---------- waitlist form (mock, no real submit) ----------
+  var form = document.getElementById("waitlistForm");
+  var emailField = document.getElementById("emailField");
+  var emailInput = document.getElementById("email");
+  var honeypot = document.getElementById("empresa");
+  var submitBtn = document.getElementById("ctaSubmit");
+  var resultEl = document.getElementById("ctaResult");
+
+  function validEmail(v){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  }
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    if (honeypot.value){ return; }
+
+    if (!validEmail(emailInput.value)){
+      emailField.classList.add("has-error");
+      emailInput.focus();
+      return;
+    }
+    emailField.classList.remove("has-error");
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Enviando…";
+    resultEl.classList.remove("is-shown");
+
+    setTimeout(function(){
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Entra en la lista de espera";
+      resultEl.textContent = "El alta todavía no está operativa en esta versión de prueba.";
+      resultEl.classList.add("is-shown");
+    }, 700);
+  });
+
+})();
+</script>
+</body>
+</html>
