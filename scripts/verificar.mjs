@@ -6,14 +6,9 @@
  * de precio, ausencia de secretos, rutas que resuelven y placeholder de la
  * demo correctamente rotulado.
  *
- * MAK-100 (Fase 4, variante B) suma `/b/` a RUTAS: mismo copy, mismo orden,
- * mismo formulario que el control, verificado sobre el HTML ya construido de
- * esa ruta — la variante no se da por buena a ojo.
- *
- * MAK-112 porta la demo real (MAK-101) a las variantes A y B: el check de
- * jszip-antes-que-epub.min.js/openFailed pasa a leer la fuente de los tres
- * componentes de Demo en vez del bundle de `dist/`, porque compartir
- * `src/lib/demo.ts` entre tres componentes lo separa en un chunk propio.
+ * Fase 6 de la ronda 3 (MAK-130) propaga el concepto B ganador a `/` y
+ * retira `/a/` y `/b/` (variantes de la ronda 2, descartadas): ya no hay
+ * más ruta que el control.
  *
  *   npm run build && npm run verificar
  */
@@ -22,18 +17,7 @@ import { join } from 'node:path'
 
 // El control (MAK-143, concepto B ganador — "la página es tinta
 // eléctrica") compone FAQ antes que CTA: construye el argumento y cierra
-// dudas antes de pedir el correo. `/a/` y `/b/` son variantes de la ronda 2
-// (descartadas, sin tocar aquí) y conservan el orden clásico heredado del
-// control anterior.
-const ORDEN_CLASICO = [
-  'Los enlaces que guardas en Recordatorios, convertidos en un libro con índice para tu Kindle.',
-  'Así llega a tu Kindle',
-  'Tres pasos, cero apps nuevas',
-  '¿Y por qué no uso ya Send to Kindle?',
-  'Se queda en tu Mac',
-  'Entra en la lista de espera',
-  'Preguntas antes de apuntarte',
-]
+// dudas antes de pedir el correo.
 const ORDEN_TINTA = [
   'Los enlaces que guardas en Recordatorios, convertidos en un libro con índice para tu Kindle.',
   'Así llega a tu Kindle',
@@ -44,11 +28,7 @@ const ORDEN_TINTA = [
   'Entra en la lista de espera',
 ]
 
-const RUTAS = [
-  ['control /', 'dist/index.html', ORDEN_TINTA],
-  ['variante A /a/', 'dist/a/index.html', ORDEN_CLASICO],
-  ['variante B /b/', 'dist/b/index.html', ORDEN_CLASICO],
-]
+const RUTAS = [['control /', 'dist/index.html', ORDEN_TINTA]]
 
 const faltan = RUTAS.filter(([, f]) => !existsSync(f))
 if (faltan.length) {
@@ -101,11 +81,8 @@ const INNEGOCIABLES = [
 
 // La nota "El EPUB de la derecha usa un fichero de ejemplo con contenido de
 // relleno…" es un TODO interno de equipo (content/copy.ts, demo.notaContenido),
-// no copy aprobado — nunca debe llegar al visitante. El control (concepto B,
-// MAK-151) ya no la renderiza; `/a/` y `/b/` son variantes descartadas y sin
-// tocar, así que siguen mostrándola hasta que se retiren del todo.
+// no copy aprobado — nunca debe llegar al visitante (MAK-151).
 const NOTA_INTERNA = 'El EPUB de la derecha usa un fichero de ejemplo con contenido de relleno'
-const NOTA_INTERNA_RUTAS = { 'control /': false, 'variante A /a/': true, 'variante B /b/': true }
 
 // Ninguna cifra ni palabra de precio en ningún punto del HTML (CA de MAK-95).
 const PRECIO = ['€', '$', 'gratis', 'free']
@@ -123,11 +100,7 @@ for (const [ruta, fichero, ORDEN] of RUTAS) {
     if (!texto.includes(norm(esperado))) mal(ruta, `${nombre}: NO aparece literal`)
   }
 
-  const debeLlevarNotaInterna = NOTA_INTERNA_RUTAS[ruta]
-  const llevaNotaInterna = texto.includes(NOTA_INTERNA)
-  if (debeLlevarNotaInterna && !llevaNotaInterna)
-    mal(ruta, 'demo · nota de contenido de ejemplo: NO aparece literal')
-  if (!debeLlevarNotaInterna && llevaNotaInterna)
+  if (texto.includes(NOTA_INTERNA))
     mal(ruta, 'demo · nota interna de equipo visible al público (debe ser solo comentario de código)')
 
   let desde = -1
@@ -211,26 +184,21 @@ for (const f of [...paginas, ...hojas]) {
 if (terceros.length) fallos.push(`recursos de dominios ajenos: ${terceros.join(', ')}`)
 else console.log(`ok  sin recursos de terceros (${paginas.length} páginas, ${hojas.length} hojas de estilo)`)
 
-// --- Demo embebida (MAK-101, portada a las variantes en MAK-112): el EPUB
-//     de prueba se publica y las tres variantes cargan jszip ANTES que
-//     epub.min.js (si no, book.open() se cuelga sin error — ver
-//     docs/design/02-demo-embebida.md en readlater-epub) y escuchan
-//     'openFailed' además de la resolución de book.loaded.navigation.
+// --- Demo embebida (MAK-101): el EPUB de prueba se publica y el componente
+//     de Demo carga jszip ANTES que epub.min.js (si no, book.open() se
+//     cuelga sin error — ver docs/design/02-demo-embebida.md en
+//     readlater-epub) y escucha 'openFailed' además de la resolución de
+//     book.loaded.navigation.
 //
-//     Se comprueba en la FUENTE de cada componente de Demo, no en el bundle
-//     de `dist/`: desde que las tres variantes comparten `src/lib/demo.ts`,
-//     Vite lo separa en un chunk propio y el orden textual de las cadenas
-//     "jszip"/"epubjs" dentro de un bundle ya no refleja el orden real en
-//     que el código los carga.
+//     Se comprueba en la FUENTE del componente, no en el bundle de `dist/`:
+//     Vite separa `src/lib/demo.ts` en un chunk propio y el orden textual
+//     de las cadenas "jszip"/"epubjs" dentro de un bundle ya no refleja el
+//     orden real en que el código los carga.
 if (!existsSync('dist/demo/demo-epub-placeholder.epub'))
   fallos.push('falta dist/demo/demo-epub-placeholder.epub (el EPUB de prueba de la demo)')
 else console.log('ok  demo · EPUB de prueba publicado en dist/demo/')
 
-const DEMO_COMPONENTES = [
-  'src/components/secciones/Demo.astro',
-  'src/components/secciones/DemoA.astro',
-  'src/components/secciones/b/Demo.astro',
-]
+const DEMO_COMPONENTES = ['src/components/secciones/Demo.astro']
 const erroresPrevios = fallos.length
 for (const ruta of DEMO_COMPONENTES) {
   if (!existsSync(ruta)) {
@@ -245,13 +213,12 @@ for (const ruta of DEMO_COMPONENTES) {
   if (!fuente.includes('openFailed')) fallos.push(`${ruta}: no escucha el evento openFailed de epub.js`)
 }
 if (fallos.length === erroresPrevios)
-  console.log('ok  demo · las tres variantes cargan jszip antes que epub.min.js y escuchan openFailed')
+  console.log('ok  demo · carga jszip antes que epub.min.js y escucha openFailed')
 
-// --- Rutas de todas las variantes publicadas. Solo existe el control por
-//     ahora (MAK-95 es Fase 3; la Fase 4 añade /a/ y /b/ a esta lista).
+// --- Rutas publicadas. Fase 6 de la ronda 3 (MAK-130) retira `/a/` y `/b/`:
+//     solo queda el control.
 const RUTAS_ESPERADAS = [
   'dist/index.html',
-  'dist/b/index.html',
   'dist/gracias/index.html',
   'dist/privacidad/index.html',
   'dist/404.html',
@@ -266,8 +233,7 @@ if (!/User-agent:\s*\*/.test(robots) || !/Disallow:\s*\/\s*$/m.test(robots))
   fallos.push('el robots.txt ya no bloquea todo el sitio')
 else console.log('ok  robots.txt · sigue bloqueando la versión de prueba')
 
-// --- Sitemap: solo el control. Cuando existan /a/ y /b/, siguen sin entrar
-//     (son pestañas de revisión, no páginas del sitio) — igual que en echo.
+// --- Sitemap: solo el control.
 const sitemapPath = 'dist/sitemap-0.xml'
 if (!existsSync(sitemapPath)) fallos.push('falta dist/sitemap-0.xml')
 else {

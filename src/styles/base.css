@@ -1,8 +1,7 @@
 /* ============================================================================
-   Reglas estructurales compartidas entre el control y sus variantes. No fija
-   valores de marca (eso vive en cada `tokens*.css`) — solo layout, estados y
-   comportamiento. Lo importan `global.css` (control) y `global-a.css`
-   (variante A) después de su propio `@theme`.
+   Reglas estructurales compartidas. No fija valores de marca (eso vive en
+   `tokens.css`) — solo layout, estados y comportamiento. Lo importa
+   `global.css` después de su propio `@theme`.
    ========================================================================= */
 
 @layer base {
