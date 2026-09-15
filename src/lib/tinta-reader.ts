@@ -144,8 +144,14 @@ if (stage && flashOverlay && ghostLayer && statusBar && tocDialog && tocList && 
     flashThenSwap(() => {
       // Con movimiento reducido: sin flash Y sin fantasma — página limpia.
       // Tampoco al entrar en una pantalla con controles interactivos reales
-      // que el fantasma no debe tapar (MAK-154).
-      if (!reduced() && !to.hasAttribute('data-no-ghost')) pushGhost(from)
+      // que el fantasma no debe tapar (MAK-154): además de no crear uno
+      // nuevo, hay que limpiar uno que ya estuviera vivo de una transición
+      // anterior (dura hasta 4.6s) — si no, encadenar dos pasos de página
+      // rápido (p. ej. 5→6→7) deja el fantasma de la 5 tapando el
+      // formulario de la 7, el mismo bug por una ruta de dos saltos
+      // (hallazgo de revisión, MAK-154).
+      if (to.hasAttribute('data-no-ghost')) clearGhosts()
+      else if (!reduced()) pushGhost(from)
       from.classList.remove('is-active')
       from.setAttribute('inert', '')
       from.setAttribute('aria-hidden', 'true')
