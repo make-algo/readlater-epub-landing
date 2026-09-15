@@ -97,8 +97,15 @@ const INNEGOCIABLES = [
   ['FAQ · precio', '¿Cuánto cuesta?'],
   ['FAQ · precio, respuesta', 'Aún no lo hemos fijado; quien entra en la lista de espera lo sabrá antes que nadie.'],
   ['FAQ · descarga', '¿Cuándo hay descarga?'],
-  ['demo · nota de contenido de ejemplo', 'El EPUB de la derecha usa un fichero de ejemplo con contenido de relleno'],
 ]
+
+// La nota "El EPUB de la derecha usa un fichero de ejemplo con contenido de
+// relleno…" es un TODO interno de equipo (content/copy.ts, demo.notaContenido),
+// no copy aprobado — nunca debe llegar al visitante. El control (concepto B,
+// MAK-151) ya no la renderiza; `/a/` y `/b/` son variantes descartadas y sin
+// tocar, así que siguen mostrándola hasta que se retiren del todo.
+const NOTA_INTERNA = 'El EPUB de la derecha usa un fichero de ejemplo con contenido de relleno'
+const NOTA_INTERNA_RUTAS = { 'control /': false, 'variante A /a/': true, 'variante B /b/': true }
 
 // Ninguna cifra ni palabra de precio en ningún punto del HTML (CA de MAK-95).
 const PRECIO = ['€', '$', 'gratis', 'free']
@@ -115,6 +122,13 @@ for (const [ruta, fichero, ORDEN] of RUTAS) {
   for (const [nombre, esperado] of INNEGOCIABLES) {
     if (!texto.includes(norm(esperado))) mal(ruta, `${nombre}: NO aparece literal`)
   }
+
+  const debeLlevarNotaInterna = NOTA_INTERNA_RUTAS[ruta]
+  const llevaNotaInterna = texto.includes(NOTA_INTERNA)
+  if (debeLlevarNotaInterna && !llevaNotaInterna)
+    mal(ruta, 'demo · nota de contenido de ejemplo: NO aparece literal')
+  if (!debeLlevarNotaInterna && llevaNotaInterna)
+    mal(ruta, 'demo · nota interna de equipo visible al público (debe ser solo comentario de código)')
 
   let desde = -1
   for (const frase of ORDEN) {

@@ -14,6 +14,11 @@
  *     de destino aunque el componente no le haya puesto `tabindex="-1"` —
  *     así los screens que reutilizan componentes reales (Demo, WaitlistForm)
  *     no necesitan tocar su propio marcado para ser accesibles aquí.
+ *   - `pushGhost` nunca se llama al ENTRAR en una pantalla marcada
+ *     `data-no-ghost` (la del formulario, MAK-154): el fantasma es memoria
+ *     de la pantalla anterior y no debe leerse detrás de controles
+ *     interactivos reales — la crítica MAK-151 lo pilló tapando el campo de
+ *     correo y los radios de la pantalla 8.
  *
  * La demo del EPUB NO se gestiona aquí: `secciones/Demo.astro` (reusado tal
  * cual desde el control) trae su propio script con IntersectionObserver,
@@ -138,7 +143,15 @@ if (stage && flashOverlay && ghostLayer && statusBar && tocDialog && tocList && 
 
     flashThenSwap(() => {
       // Con movimiento reducido: sin flash Y sin fantasma — página limpia.
-      if (!reduced()) pushGhost(from)
+      // Tampoco al entrar en una pantalla con controles interactivos reales
+      // que el fantasma no debe tapar (MAK-154): además de no crear uno
+      // nuevo, hay que limpiar uno que ya estuviera vivo de una transición
+      // anterior (dura hasta 4.6s) — si no, encadenar dos pasos de página
+      // rápido (p. ej. 5→6→7) deja el fantasma de la 5 tapando el
+      // formulario de la 7, el mismo bug por una ruta de dos saltos
+      // (hallazgo de revisión, MAK-154).
+      if (to.hasAttribute('data-no-ghost')) clearGhosts()
+      else if (!reduced()) pushGhost(from)
       from.classList.remove('is-active')
       from.setAttribute('inert', '')
       from.setAttribute('aria-hidden', 'true')
