@@ -75,6 +75,11 @@ button, input, a { font-family: inherit; }
   background: var(--paper);
 }
 .chrome-top .wordmark { color: var(--ink); font-weight: 700; }
+/* Crítica MAK-151: el gris de `--ink-soft` en tamaño de microtipografía
+   (.7rem) se leía por debajo de AA en la revisión — la barra de estado no
+   es contenido secundario, sostiene el concepto de e-ink y tiene que leerse
+   siempre. Mismo tono monocromo, sin bajar a --ink-soft. */
+.chrome-top .battery { color: var(--ink); }
 
 .stage {
   position: relative;
@@ -114,7 +119,9 @@ button, input, a { font-family: inherit; }
   letter-spacing: .04em;
 }
 .chrome-bottom .toc-open:hover { background: var(--ink); color: var(--paper); }
-.chrome-bottom .hint { color: var(--ink-soft); display: none; }
+/* Mismo motivo que `.battery`: las instrucciones de paso de página son
+   microtipografía funcional, no un pie de nota — suben a --ink (MAK-151). */
+.chrome-bottom .hint { color: var(--ink); display: none; }
 @media (min-width: 760px) { .chrome-bottom .hint { display: inline; } }
 
 /* ---- pantallas ---- */
@@ -128,7 +135,13 @@ button, input, a { font-family: inherit; }
   padding: 6vh 8vw 4vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* Crítica MAK-151: cada pantalla centraba su propio contenido, así que la
+     altura variable de cada una (una lista de tres pasos no es lo mismo que
+     un párrafo) dejaba folio suelto debajo en unas y el bloque flotando a
+     media altura en otras. Retícula de arranque única — margen superior fijo
+     (el `padding` de arriba), la mancha de texto arranca ahí siempre, como
+     la página de un libro. */
+  justify-content: flex-start;
   gap: 1.4rem;
 }
 .screen.is-active { visibility: visible; opacity: 1; }
@@ -145,7 +158,22 @@ button, input, a { font-family: inherit; }
 }
 .screen h1, .screen h2 { font-weight: 700; line-height: 1.08; margin: 0 0 .5em; letter-spacing: -.01em; }
 .screen h1 { font-size: clamp(2rem, 5.4vw, 3.6rem); }
-.screen h2 { font-size: clamp(1.5rem, 3.6vw, 2.3rem); }
+/* Crítica MAK-151: a .5em el H2 casi tocaba el filete de la primera fila de
+   la lista/tarjeta siguiente (pasos, comparativa) — sin aire. */
+.screen h2 { font-size: clamp(1.5rem, 3.6vw, 2.3rem); margin-bottom: 1em; }
+
+/* Pantalla de CTA: el H2 (`cta.nombre`) repite literalmente el texto del
+   botón real de envío (`cta.boton.reposo`) — ambos son "Entra en la lista
+   de espera" por copy congelado, no se toca. En bold grande se leía como un
+   segundo botón compitiendo con la CTA real (MAK-151); se le da un
+   tratamiento tipográfico de titular editorial, no de control, para que
+   quede claro que es el título de la pantalla y no una acción. */
+#screen-7 .screen-inner h2 {
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+  letter-spacing: 0;
+}
 .screen p { font-size: clamp(1rem, 1.6vw, 1.2rem); line-height: 1.5; max-width: 38rem; color: var(--ink); }
 .screen p.lede { font-size: clamp(1.1rem, 2vw, 1.35rem); }
 

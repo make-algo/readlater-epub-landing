@@ -65,7 +65,12 @@ const skeletonHtml = `<div class="skeleton">
     </div>
   </div>
 
-  <p class="demo-caption">{demo.notaContenido}</p>
+  <!--
+    demo.notaContenido (content/copy.ts) es una nota interna de equipo sobre
+    el fichero de ejemplo, no un texto para el visitante — no se renderiza
+    aquí (MAK-154). Se sustituye por el EPUB real que genera la app en
+    cuanto MAK-91 lo entregue (ver src/lib/demo.ts).
+  -->
 </section>
 
 <style is:global>
@@ -307,14 +312,6 @@ const skeletonHtml = `<div class="skeleton">
   }
   .reader-viewport p {
     margin: 0 0 0.9rem;
-  }
-
-  .demo-caption {
-    font-family: var(--demo-font-mono);
-    font-size: 0.75rem;
-    color: var(--demo-ink-soft);
-    margin-top: 0.875rem;
-    max-width: 45rem;
   }
 
   /* ============ Móvil: tabs en vez de columnas encogidas ============ */
