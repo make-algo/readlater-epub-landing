@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>ReadLater EPUB — de Recordatorios a un libro para tu Kindle</title>
+<meta name="description" content="Los enlaces que guardas en Recordatorios, convertidos en un único EPUB con índice, listo para tu Kindle. Sin cuenta, sin nube: todo ocurre en tu Mac." />
+<style>
+  :root{
+    --bg:#0a0d0f;
+    --bg-raised:#12171a;
+    --bg-raised-2:#171d21;
+    --ink:#eef3f1;
+    --ink-dim:#8ea09b;
+    --ink-dimmer:#5b6b67;
+    --rule:#232b2e;
+    --rule-strong:#33403f;
+    --accent:#c8ff4d;
+    --accent-ink:#1c2400;
+    --focus:#eaffb0;
+    --radius:2px;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ background:var(--bg); }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{ color:inherit; }
+
+  .visually-hidden{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+
+  .skip-link{
+    position:absolute; left:1rem; top:-3rem;
+    background:var(--accent); color:var(--accent-ink);
+    padding:.6rem 1rem; font-weight:700; z-index:100;
+    transition:top .15s ease;
+  }
+  .skip-link:focus{ top:1rem; }
+
+  :focus-visible{
+    outline:3px solid var(--focus);
+    outline-offset:2px;
+  }
+
+  /* ---------- sticky app header ---------- */
+  .app-bar{
+    position:sticky; top:0; z-index:20;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:1rem;
+    padding:.85rem 1.25rem;
+    background:rgba(10,13,15,.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--rule);
+    font-family:var(--mono);
+    font-size:.78rem;
+  }
+  .app-bar__title{
+    display:flex; align-items:baseline; gap:.6rem;
+    color:var(--ink-dim);
+    letter-spacing:.02em;
+  }
+  .app-bar__title strong{
+    color:var(--ink);
+    font-weight:600;
+  }
+  .app-bar__queue{
+    display:flex; align-items:center; gap:.5rem;
+    color:var(--ink-dim);
+  }
+  .app-bar__queue b{
+    color:var(--accent);
+    font-weight:700;
+  }
+  .app-bar__dot{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--ink-dimmer);
+    flex:none;
+  }
+  .app-bar__queue.bump .app-bar__dot{
+    animation:queue-pulse .6s ease;
+  }
+  @keyframes queue-pulse{
+    0%{ background:var(--accent); box-shadow:0 0 0 0 rgba(200,255,77,.6); }
+    100%{ background:var(--ink-dimmer); box-shadow:0 0 0 8px rgba(200,255,77,0); }
+  }
+
+  main{
+    max-width:46rem;
+    margin:0 auto;
+    padding:0 1.25rem 6rem;
+  }
+
+  /* ---------- the list ---------- */
+  .list{
+    list-style:none;
+    margin:0;
+    padding:2.5rem 0 0;
+  }
+
+  /* El espaciado y el filete de grupo van en el <li> (item--group), no en
+     el kicker: un margen dentro de una celda de grid no empuja a su hermano
+     de columna (el checkbox), así que si viviera en el kicker el checkbox
+     quedaría flotando por encima de un hueco vacío. */
+  .item.item--group{
+    margin-top:3.2rem;
+    padding-top:1.6rem;
+    border-top:1px solid var(--rule);
+  }
+  .kicker{
+    font-family:var(--mono);
+    font-size:.72rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    margin:0 0 .9rem;
+  }
+
+  .item{
+    position:relative;
+    display:grid;
+    grid-template-columns:1.6rem 1fr;
+    gap:.9rem;
+    padding:1.1rem 0;
+    border-bottom:1px solid var(--rule);
+  }
+
+  .item__box{
+    width:1.15rem; height:1.15rem;
+    margin-top:.2rem;
+    border:2px solid var(--ink-dimmer);
+    border-radius:1px;
+    flex:none;
+    position:relative;
+    transition:border-color .45s ease, background-color .45s ease;
+  }
+  .item__box::after{
+    content:"";
+    position:absolute; inset:2px;
+    background:var(--accent);
+    transform:scaleX(0);
+    transform-origin:left;
+    transition:transform .5s cubic-bezier(.4,0,.2,1);
+  }
+  .item.is-done .item__box{
+    border-color:var(--accent);
+  }
+  .item.is-done .item__box::after{
+    transform:scaleX(1);
+  }
+
+  .item__body{ min-width:0; }
+
+  /* título + regleta de puntos + página: una fila propia dentro del cuerpo
+     del ítem, en vez de columnas del grid exterior — así el título nunca
+     se ve forzado a una columna estrecha cuando el ítem se completa. */
+  .item__row{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:baseline;
+    gap:.5rem .6rem;
+    min-width:0;
+  }
+
+  .item__title{
+    margin:0 0 .3rem;
+    font-size:1.05rem;
+    font-weight:650;
+    color:var(--ink);
+    min-width:0;
+    transition:color .4s ease, font-size .4s ease, letter-spacing .4s ease;
+  }
+  .item__hero .item__title{
+    font-size:1.7rem;
+    line-height:1.22;
+    font-weight:700;
+  }
+  .item__text{
+    margin:0;
+    color:var(--ink-dim);
+    font-size:.94rem;
+    max-width:38rem;
+  }
+  .item__hero .item__text{ font-size:1.05rem; }
+
+  .item__cta{
+    margin-top:1.1rem;
+  }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:.5rem;
+    background:var(--accent);
+    color:var(--accent-ink);
+    border:none;
+    font:inherit;
+    font-weight:700;
+    font-size:.92rem;
+    padding:.75rem 1.25rem;
+    border-radius:1px;
+    cursor:pointer;
+  }
+  .btn[disabled]{ opacity:.6; cursor:default; }
+
+  /* ---------- transformed state: reminder -> index row ---------- */
+  .item.is-done{
+    padding:.6rem 0;
+  }
+  .item.is-done .item__box{
+    margin-top:.15rem;
+    width:.85rem; height:.85rem;
+  }
+  .item.is-done .item__title{
+    margin:0;
+    font-size:.86rem;
+    font-weight:600;
+    letter-spacing:.02em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+  }
+  .item.is-done .item__text,
+  .item.is-done .item__cta{
+    display:none;
+  }
+  .item__leader{
+    display:none;
+    order:2;
+    flex:1 1 3rem;
+    align-self:end;
+    border-bottom:1px dotted var(--rule-strong);
+    height:1px;
+    margin-bottom:.35em;
+  }
+  .item.is-done .item__leader{ display:block; }
+  .item__page{
+    display:none;
+    order:3;
+    flex:none;
+    font-family:var(--mono);
+    font-size:.82rem;
+    color:var(--ink-dim);
+  }
+  .item.is-done .item__page{ display:block; }
+
+  .item__answer{
+    grid-column:2 / -1;
+    margin:.5rem 0 0;
+    color:var(--ink-dim);
+    font-size:.92rem;
+    max-width:36rem;
+  }
+  .item:not(.is-done) .item__answer{ display:none; }
+
+  .item__status{ }
+
+  /* ---------- demo block ---------- */
+  .demo{
+    grid-column:1 / -1;
+    margin-top:1rem;
+    display:grid;
+    gap:1rem;
+  }
+  @media (min-width:640px){
+    .demo{ grid-template-columns:1fr 1fr; }
+  }
+  .demo figure{
+    margin:0;
+    background:var(--bg-raised);
+    border:1px solid var(--rule);
+    padding:.6rem;
+  }
+  .demo img{
+    display:block; width:100%; height:auto;
+    filter:grayscale(.15) contrast(1.02);
+  }
+  .demo figcaption{
+    font-family:var(--mono);
+    font-size:.72rem;
+    color:var(--ink-dim);
+    padding:.5rem .2rem 0;
+    letter-spacing:.02em;
+  }
+  .toc-mock{
+    background:var(--bg-raised-2);
+    border:1px solid var(--rule);
+    padding:1rem 1rem .6rem;
+    font-family:var(--mono);
+    font-size:.82rem;
+  }
+  .toc-mock__head{
+    color:var(--ink-dim);
+    font-size:.7rem;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    margin-bottom:.7rem;
+  }
+  .toc-mock ol{
+    list-style:none; margin:0; padding:0;
+  }
+  .toc-mock li{
+    display:flex; gap:.5rem;
+    padding:.35rem 0;
+    border-bottom:1px dotted var(--rule);
+    color:var(--ink-dim);
+  }
+  .toc-mock li span:first-child{ flex:1; color:var(--ink); }
+  .demo__note{
+    grid-column:1/-1;
+    font-size:.85rem;
+    color:var(--ink-dim);
+    margin:0;
+  }
+
+  /* ---------- comparativa mini rows ---------- */
+  .compare{ grid-column:2; display:grid; gap:.7rem; margin-top:.4rem; max-width:38rem; }
+  .compare > div{ padding:.6rem .8rem; border-left:2px solid var(--rule-strong); }
+  .compare h4{ margin:0 0 .2rem; font-size:.85rem; color:var(--ink); }
+  .compare p{ margin:0; font-size:.88rem; color:var(--ink-dim); }
+  .item.is-done .compare{ display:none; }
+
+  /* ---------- final item / form ---------- */
+  .final{ padding-top:3rem; margin-top:1rem; border-top:1px solid var(--rule); }
+  .final .item{ border-bottom:none; }
+  .final:not(.is-complete) .item{ padding-bottom:0; }
+
+  form.waitlist{
+    grid-column:2 / -1;
+    display:grid;
+    gap:1rem;
+    max-width:28rem;
+    margin-top:.8rem;
+  }
+  .field{ display:grid; gap:.35rem; }
+  .field label{ font-size:.85rem; color:var(--ink-dim); }
+  .field input[type=email]{
+    background:var(--bg-raised);
+    border:1px solid var(--rule-strong);
+    color:var(--ink);
+    padding:.7rem .8rem;
+    font:inherit;
+    font-size:.95rem;
+    border-radius:1px;
+  }
+  .field input[type=email]:focus-visible{ border-color:var(--accent); }
+  .field.has-error input{ border-color:#ff6b6b; }
+  .field__error{ font-size:.8rem; color:#ff8a8a; margin:0; display:none; }
+  .field.has-error .field__error{ display:block; }
+
+  fieldset{ border:1px solid var(--rule-strong); padding:.8rem .9rem; border-radius:1px; }
+  legend{ font-size:.85rem; color:var(--ink-dim); padding:0 .3rem; }
+  .radios{ display:flex; flex-wrap:wrap; gap:.9rem; margin-top:.5rem; }
+  .radios label{ display:flex; align-items:center; gap:.4rem; font-size:.9rem; }
+
+  .honeypot{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+
+  .form-msg{
+    font-size:.88rem;
+    padding:.7rem .9rem;
+    border:1px solid var(--rule-strong);
+    display:none;
+  }
+  .form-msg.show{ display:block; }
+  .form-msg.ok{ border-color:var(--accent); color:var(--ink); }
+  .form-msg.error{ border-color:#ff6b6b; color:#ffb3b3; }
+
+  .legal{ font-size:.78rem; color:var(--ink-dim); max-width:30rem; }
+  .legal a{ text-decoration:underline; }
+
+  /* al completarse, el propio ítem del formulario se pliega igual que
+     cualquier otro: título convertido en entrada de índice, formulario
+     fuera. No hace falta un bloque aparte para el cierre. */
+  .final.is-complete form.waitlist{ display:none; }
+
+  footer{
+    max-width:46rem;
+    margin:0 auto;
+    padding:2rem 1.25rem 3rem;
+    font-family:var(--mono);
+    font-size:.72rem;
+    color:var(--ink-dim);
+    border-top:1px solid var(--rule);
+  }
+
+  @media (max-width:480px){
+    main{ padding:0 1rem 5rem; }
+    .item__hero .item__title{ font-size:1.35rem; }
+    .app-bar{ padding:.7rem .9rem; font-size:.7rem; }
+    .item.is-done .item__leader{ display:none; }
+    .item.is-done .item__page{ flex-basis:100%; margin-top:.1rem; }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header class="app-bar">
+  <span class="app-bar__title">
+    <strong id="bar-label">Recordatorios</strong>
+    <span aria-hidden="true">·</span>
+    <span id="bar-sub">Leer más tarde</span>
+  </span>
+  <span class="app-bar__queue" id="queue-badge">
+    <span class="app-bar__dot" aria-hidden="true"></span>
+    En cola: <b id="queue-count">3</b>
+  </span>
+</header>
+
+<main id="contenido">
+  <ul class="list" id="reminder-list">
+
+    <li class="item item__hero" data-page="i">
+      <span class="item__box" aria-hidden="true"></span>      <div class="item__body">
+        <p class="kicker">Recordatorio</p>
+        <div class="item__row">
+
+          <h1 class="item__title">Los enlaces que guardas en Recordatorios, convertidos en un libro con índice para tu Kindle.</h1>
+
+          <span class="item__leader" aria-hidden="true"></span>
+
+          <span class="item__page" aria-hidden="true">i</span>
+
+        </div>
+        <p class="item__text">ReadLater EPUB junta lo que acumulas en Recordatorios y genera un único EPUB navegable — sin cuenta, sin nube, sin mandarlos uno a uno.</p>
+        <span class="visually-hidden item__status">Pendiente</span>
+      </div>
+    </li>
+
+    <li class="item item--group" data-page="ii">
+      <span class="item__box" aria-hidden="true"></span>      <div class="item__body">
+        <p class="kicker">Tres pasos, cero apps nuevas</p>
+        <div class="item__row">
+
+          <h2 class="item__title">Compartir → Recordatorios.</h2>
+
+          <span class="item__leader" aria-hidden="true"></span>
+
+          <span class="item__page" aria-hidden="true">ii</span>
+
+        </div>
+        <p class="item__text">Desde Safari o cualquier app, el gesto de compartir que ya usas.</p>
+        <span class="visually-hidden item__status">Pendiente</span>
+      </div>
+    </li>
+
+    <li class="item" data-page="iii">
+      <span class="item__box" aria-hidden="true"></span>      <div class="item__body">
+        <div class="item__row">
+
+          <h2 class="item__title">Abrir ReadLater EPUB.</h2>
+
+          <span class="item__leader" aria-hidden="true"></span>
+
+          <span class="item__page" aria-hidden="true">iii</span>
+
+        </div>
+        <p class="item__text">Un clic en el Mac, sin login.</p>
+        <span class="visually-hidden item__status">Pendiente</span>
+      </div>
+    </li>
+
+    <li class="item" data-page="iv">
+      <span class="item__box" aria-hidden="true"></span>      <div class="item__body">
+        <div class="item__row">
+
+          <h2 class="item__title">EPUB en tu Kindle.</h2>
+
+          <span class="item__leader" aria-hidden="true"></span>
+
+          <span class="item__page" aria-hidden="true">iv</span>
+
+        </div>
+        <p class="item__text">Arrastra o envía el fichero — no hay paso de nube intermedio.</p>
+        <span class="visually-hidden item__status">Pendiente</span>
+      </div>
+    </li>
+
+    <li class="item item--group" data-page="1">
+      <span class="item__box" aria-hidden="true"></span>      <div class="item__body">
+        <p class="kicker">Comparativa</p>
+        <div class="item__row">
+
+          <h2 class="item__title">¿Y por qué no uso ya Send to Kindle?</h2>
+
+          <span class="item__leader" aria-hidden="true"></span>
+
+          <span class="item__page" aria-hidden="true">1</span>
+
+        </div>
+        <div class="compare">
+          <div>
+            <h4>Send to Kindle</h4>
+            <p>Un documento por artículo, sin índice entre ellos, y hay que acordarse en el momento de leer el enlace.</p>
+          </div>
+          <div>
+            <h4>ReadLater EPUB</h4>
+            <p>La semana acumulada en Recordatorios se convierte en un solo documento navegable, sin depender de acordarte al momento.</p>
+          </div>
+          <div>
+            <h4>Instapaper, Readwise, Matter</h4>
+            <p>Instapaper, Readwise y Matter son servicios en la nube con cuenta y, casi todos, con suscripción. ReadLater EPUB no pide cuenta porque no hay servidor que mantener.</p>
+          </div>
+        </div>
+        <span class="visually-hidden item__status">Pendiente</span>
+      </div>
+    </li>
+
+    <li class="item item--group" data-page="2">
+      <span class="item__box" aria-hidden="true"></span>      <div class="item__body">
+        <p class="kicker">Así llega a tu Kindle</p>
+        <div class="item__row">
+
+          <h2 class="item__title">Así llega a tu Kindle</h2>
+
+          <span class="item__leader" aria-hidden="true"></span>
+
+          <span class="item__page" aria-hidden="true">2</span>
+
+        </div>
+        <p class="item__text">El resultado no son artículos sueltos: es un único EPUB con índice, navegable como un libro.</p>
+        <div class="demo">
+          <figure>
+            <img src="web-original.png" alt="Captura estática de una página web de ejemplo, tal como se guardaría en Recordatorios." width="1280" height="900" loading="lazy" />
+            <figcaption>Web original — vista estática — el sitio original no permite embebido en vivo</figcaption>
+          </figure>
+          <div class="toc-mock" role="img" aria-label="Vista previa del índice del EPUB generado, con capítulos y número de página.">
+            <div class="toc-mock__head">EPUB generado — readlater · índice navegable</div>
+            <ol>
+              <li><span>Compartir → Recordatorios</span><span>ii</span></li>
+              <li><span>Abrir ReadLater EPUB</span><span>iii</span></li>
+              <li><span>¿Y por qué no Send to Kindle?</span><span>1</span></li>
+              <li><span>Se queda en tu Mac</span><span>3</span></li>
+              <li><span>Preguntas antes de apuntarte</span><span>4</span></li>
+            </ol>
+          </div>
+          <p class="demo__note">El EPUB de la derecha usa un fichero de ejemplo con contenido de relleno — se sustituye por el que genera la propia app en cuanto esté disponible. Vista previa del índice construida con HTML/CSS: pendiente de sustituir por una captura real de un Kindle físico antes de propagar este concepto.</p>
+        </div>
+        <span class="visually-hidden item__status">Pendiente</span>
+      </div>
+    </li>
+
+    <li class="item item--group" data-page="3">
+      <span class="item__box" aria-hidden="true"></span>      <div class="item__body">
+        <p class="kicker">Se queda en tu Mac</p>
+        <div class="item__row">
+
+          <h2 class="item__title">Se queda en tu Mac</h2>
+
+          <span class="item__leader" aria-hidden="true"></span>
+
+          <span class="item__page" aria-hidden="true">3</span>
+
+        </div>
+        <p class="item__text">Todo ocurre en tu Mac. Sin cuenta, sin servidor propio, sin sincronización en la nube — lo único que sale del dispositivo es el artículo que ya pediste leer.</p>
+        <span class="visually-hidden item__status">Pendiente</span>
+      </div>
+    </li>
+
+    <li class="item item--group" data-page="4">
+      <span class="item__box" aria-hidden="true"></span>      <div class="item__body">
+        <p class="kicker">Preguntas antes de apuntarte</p>
+        <div class="item__row">
+
+          <h2 class="item__title">¿Por qué no uso directamente Send to Kindle?</h2>
+
+          <span class="item__leader" aria-hidden="true"></span>
+
+          <span class="item__page" aria-hidden="true">4</span>
+
+        </div>
+        <p class="item__text">Send to Kindle manda un documento por artículo, sin índice ni relación entre ellos, y exige acordarte en el momento de leer el enlace. ReadLater EPUB junta lo acumulado en un solo documento navegable.</p>
+        <p class="item__answer">Send to Kindle manda un documento por artículo, sin índice ni relación entre ellos, y exige acordarte en el momento de leer el enlace. ReadLater EPUB junta lo acumulado en un solo documento navegable.</p>
+        <span class="visually-hidden item__status">Pendiente</span>
+      </div>
+    </li>
+
+    <li class="item" data-page="5">
+      <span class="item__box" aria-hidden="true"></span>      <div class="item__body">
+        <div class="item__row">
+
+          <h2 class="item__title">¿Por qué no Instapaper/Readwise/Matter, que ya hacen de todo?</h2>
+
+          <span class="item__leader" aria-hidden="true"></span>
+
+          <span class="item__page" aria-hidden="true">5</span>
+
+        </div>
+        <p class="item__text">Todos son servicios en la nube con cuenta y casi todos por suscripción; ReadLater EPUB no pide cuenta ni tiene coste recurrente porque no hay servidor que mantener. Si ya estás contento pagando por búsqueda de texto completo, resúmenes con IA o sincronía multi-dispositivo, no es para ti — es para quien solo quiere que lo guardado en el móvil llegue limpio y agrupado al Kindle.</p>
+        <p class="item__answer">Todos son servicios en la nube con cuenta y casi todos por suscripción; ReadLater EPUB no pide cuenta ni tiene coste recurrente porque no hay servidor que mantener. Si ya estás contento pagando por búsqueda de texto completo, resúmenes con IA o sincronía multi-dispositivo, no es para ti — es para quien solo quiere que lo guardado en el móvil llegue limpio y agrupado al Kindle.</p>
+        <span class="visually-hidden item__status">Pendiente</span>
+      </div>
+    </li>
+
+    <li class="item" data-page="6">
+      <span class="item__box" aria-hidden="true"></span>      <div class="item__body">
+        <div class="item__row">
+
+          <h2 class="item__title">¿Y si no tengo Mac, o no lo enciendo a diario?</h2>
+
+          <span class="item__leader" aria-hidden="true"></span>
+
+          <span class="item__page" aria-hidden="true">6</span>
+
+        </div>
+        <p class="item__text">Límite real y sin resolver: el EPUB se genera al abrir la app en el Mac, no en segundo plano ni desde el móvil.</p>
+        <p class="item__answer">Límite real y sin resolver: el EPUB se genera al abrir la app en el Mac, no en segundo plano ni desde el móvil.</p>
+        <span class="visually-hidden item__status">Pendiente</span>
+      </div>
+    </li>
+
+    <li class="item" data-page="7">
+      <span class="item__box" aria-hidden="true"></span>      <div class="item__body">
+        <div class="item__row">
+
+          <h2 class="item__title">¿Cuánto cuesta?</h2>
+
+          <span class="item__leader" aria-hidden="true"></span>
+
+          <span class="item__page" aria-hidden="true">7</span>
+
+        </div>
+        <p class="item__text">Aún no lo hemos fijado; quien entra en la lista de espera lo sabrá antes que nadie.</p>
+        <p class="item__answer">Aún no lo hemos fijado; quien entra en la lista de espera lo sabrá antes que nadie.</p>
+        <span class="visually-hidden item__status">Pendiente</span>
+      </div>
+    </li>
+
+    <li class="item" data-page="8">
+      <span class="item__box" aria-hidden="true"></span>      <div class="item__body">
+        <div class="item__row">
+
+          <h2 class="item__title">¿Cuándo hay descarga?</h2>
+
+          <span class="item__leader" aria-hidden="true"></span>
+
+          <span class="item__page" aria-hidden="true">8</span>
+
+        </div>
+        <p class="item__text">Todavía no hay descarga pública: la build actual no está firmada para distribución fuera de este equipo. Quien entra en la lista de espera es de los primeros en probar la beta privada en cuanto esté firmada y notarizada.</p>
+        <p class="item__answer">Todavía no hay descarga pública: la build actual no está firmada para distribución fuera de este equipo. Quien entra en la lista de espera es de los primeros en probar la beta privada en cuanto esté firmada y notarizada.</p>
+        <span class="visually-hidden item__status">Pendiente</span>
+      </div>
+    </li>
+
+    <li class="item item--group final" id="final-item">
+      <span class="item__box" aria-hidden="true"></span>      <div class="item__body">
+        <p class="kicker">El único recordatorio que puedes completar tú</p>
+        <div class="item__row">
+
+          <h2 class="item__title">Entra en la lista de espera</h2>
+
+          <span class="item__leader" aria-hidden="true"></span>
+
+          <span class="item__page" aria-hidden="true">—</span>
+
+        </div>
+        <p class="item__text">Todavía no hay descarga pública: la build actual no está firmada para distribución fuera de este equipo. Quien entra en la lista de espera es de los primeros en probar la beta privada en cuanto esté firmada y notarizada, y antes que nadie sabrá el precio cuando se fije. Sin spam, sin más de un email al mes.</p>
+
+        <form class="waitlist" id="waitlist-form" novalidate>
+          <div class="field" id="email-field">
+            <label for="email">Correo</label>
+            <input type="email" id="email" name="email" placeholder="tú@ejemplo.com" required autocomplete="email" />
+            <p class="field__error" id="email-error">Escribe un correo con formato válido.</p>
+          </div>
+
+          <div class="honeypot" aria-hidden="true">
+            <label for="empresa">No rellenar</label>
+            <input type="text" id="empresa" name="empresa" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <fieldset>
+            <legend>¿Tienes Kindle?</legend>
+            <div class="radios">
+              <label><input type="radio" name="kindle" value="Sí" /> Sí</label>
+              <label><input type="radio" name="kindle" value="No" /> No</label>
+              <label><input type="radio" name="kindle" value="Tengo otro e-reader" /> Tengo otro e-reader</label>
+            </div>
+          </fieldset>
+
+          <button type="submit" class="btn" id="submit-btn">Entra en la lista de espera</button>
+          <p class="legal">
+            Protección de datos. Tu correo se usa solo para avisarte de la beta privada. Más detalle en la
+            <a href="/privacidad">política de privacidad</a>. Responsable: Make Algo SL.
+            Proveedor de envío del formulario: Formspree.
+          </p>
+        </form>
+        <p class="form-msg" id="form-msg" role="status" aria-live="polite"></p>
+
+        <span class="visually-hidden item__status" id="final-status">Pendiente</span>
+      </div>
+    </li>
+
+  </ul>
+</main>
+
+<footer>
+  <p>ReadLater EPUB — Make Algo SL · versión de prueba, fuera de buscadores.</p>
+</footer>
+
+<script>
+(function(){
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var items = Array.prototype.slice.call(document.querySelectorAll('.item:not(.final)'));
+  var total = items.length + 1; // + el formulario final
+  var barLabel = document.getElementById('bar-label');
+  var barSub = document.getElementById('bar-sub');
+
+  function pendingCount(){
+    return document.querySelectorAll('.item:not(.is-done)').length;
+  }
+
+  function updateBar(){
+    var pending = pendingCount();
+    if (pending === 0) {
+      barLabel.textContent = 'Índice completo';
+      barSub.textContent = total + ' capítulos';
+    } else {
+      barLabel.textContent = 'Recordatorios';
+      barSub.textContent = pending + ' pendiente' + (pending === 1 ? '' : 's');
+    }
+  }
+
+  // Un ítem se completa cuando ha pasado entero por debajo de la cabecera
+  // fija: es una comprobación de scroll, no un IntersectionObserver de banda,
+  // porque el recordatorio del héroe ocupa casi toda la pantalla y cualquier
+  // banda dentro del viewport lo solapa ya en la carga inicial.
+  var appBar = document.querySelector('.app-bar');
+
+  function checkItems(){
+    var triggerY = appBar.getBoundingClientRect().bottom + 8;
+    items.forEach(function(el){
+      if (el.classList.contains('is-done')) return;
+      if (el.getBoundingClientRect().bottom <= triggerY) {
+        el.classList.add('is-done');
+        var status = el.querySelector('.item__status');
+        if (status) status.textContent = 'Completado';
+        updateBar();
+      }
+    });
+  }
+
+  var ticking = false;
+  function onScroll(){
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function(){ checkItems(); ticking = false; });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  checkItems();
+  updateBar();
+
+  // --- cola que crece sola mientras el visitante no hace nada ---
+  var queueCount = document.getElementById('queue-count');
+  var queueBadge = document.getElementById('queue-badge');
+  var count = 3;
+  var idleTimer;
+
+  function bump(){
+    count += 1;
+    queueCount.textContent = count;
+    if (!reduceMotion) {
+      queueBadge.classList.remove('bump');
+      void queueBadge.offsetWidth;
+      queueBadge.classList.add('bump');
+    }
+  }
+
+  function scheduleIdle(){
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(bump, 5000);
+  }
+
+  ['scroll', 'keydown', 'pointermove', 'touchstart'].forEach(function(ev){
+    window.addEventListener(ev, scheduleIdle, { passive: true });
+  });
+  scheduleIdle();
+
+  // --- formulario maquetado, sin envío real ---
+  var form = document.getElementById('waitlist-form');
+  var emailField = document.getElementById('email-field');
+  var emailInput = document.getElementById('email');
+  var msg = document.getElementById('form-msg');
+  var btn = document.getElementById('submit-btn');
+  var finalItem = document.getElementById('final-item');
+  var finalStatus = document.getElementById('final-status');
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var emailOk = emailInput.validity.valid && emailInput.value.trim() !== '';
+
+    if (!emailOk) {
+      emailField.classList.add('has-error');
+      emailInput.focus();
+      return;
+    }
+    emailField.classList.remove('has-error');
+
+    btn.textContent = 'Enviando…';
+    btn.disabled = true;
+    msg.className = 'form-msg show';
+    msg.textContent = 'El alta todavía no está operativa en esta versión de prueba.';
+
+    setTimeout(function(){
+      msg.className = 'form-msg show ok';
+      msg.textContent = 'Ya estás en la lista con ' + emailInput.value.trim() + '. Te avisamos en cuanto haya beta privada. Sin spam, sin más de un email al mes.';
+      btn.textContent = 'Entra en la lista de espera';
+      btn.disabled = false;
+
+      setTimeout(function(){
+        finalItem.classList.add('is-done', 'is-complete');
+        finalStatus.textContent = 'Completado';
+        updateBar();
+      }, reduceMotion ? 0 : 2200);
+    }, reduceMotion ? 0 : 700);
+  });
+})();
+</script>
+</body>
+</html>
