@@ -1,0 +1,19 @@
+---
+import SeccionDemo from '../../secciones/Demo.astro'
+
+/**
+ * Pantalla 1 — Demo. Crítica MAK-137: la demo del prototipo (epub.js
+ * cargado ad hoc, sin el fallback que ya resolvió MAK-101) estaba rota
+ * ("No se ha podido cargar la vista previa del EPUB." permanente). En vez
+ * de repararla suelta, se reusa la demo real del control tal cual
+ * (`secciones/Demo.astro`): mismo split-screen/tabs, mismos estados de
+ * carga/éxito/error, mismos roles tablist/tab/tabpanel. Solo se reskina su
+ * paleta al monocromo de tinta (`global-tinta.css`, selector `#screen-1`).
+ */
+---
+
+<section class="screen" id="screen-1" data-title="Así llega a tu Kindle">
+  <div class="screen-inner">
+    <SeccionDemo />
+  </div>
+</section>

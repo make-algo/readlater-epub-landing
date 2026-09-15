@@ -1,0 +1,20 @@
+---
+import { comparativa } from '../../../content/copy'
+---
+
+<section class="screen" id="screen-3" data-title={comparativa.nombre}>
+  <div class="screen-inner">
+    <h2>{comparativa.nombre}</h2>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <h3>{comparativa.sendToKindle.titulo}</h3>
+        <p>{comparativa.sendToKindle.texto}</p>
+      </div>
+      <div class="comp-card win">
+        <h3>{comparativa.readlater.titulo}</h3>
+        <p>{comparativa.readlater.texto}</p>
+      </div>
+    </div>
+    <p class="comp-otros">{comparativa.otros}</p>
+  </div>
+</section>

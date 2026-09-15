@@ -1,0 +1,25 @@
+/* ============================================================================
+   ReadLater EPUB — tokens del concepto B, "La página es tinta electrónica"
+   (Fase 6, ganadora ronda 3, MAK-143). Monocromo de papel e-ink: sin acento
+   de color, sin serif de lectura — deliberadamente distinto del tic de la
+   casa (papel crema + serif + acento cálido + filetes) que ya llevan el
+   control y las variantes de rondas anteriores. Una sola retícula: todo el
+   contenido vive en `.screen-inner`.
+
+   `--font-serif` se remapea aquí al mismo sans que el resto de la página:
+   la sección Demo real (`secciones/Demo.astro`) la referencia por nombre y
+   así se integra sin forkear ese componente.
+   ========================================================================= */
+
+:root {
+  --paper: #d9d9d3;
+  --paper-dark: #c9c9c2;
+  --ink: #161613;
+  --ink-soft: #4b4b45;
+  --line: #8f8f86;
+  --focus: #161613;
+  --flash-ms: 70ms;
+
+  --font-serif: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'Courier New', ui-monospace, monospace;
+}

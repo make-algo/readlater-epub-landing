@@ -20,10 +20,34 @@
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
+// El control (MAK-143, concepto B ganador — "la página es tinta
+// eléctrica") compone FAQ antes que CTA: construye el argumento y cierra
+// dudas antes de pedir el correo. `/a/` y `/b/` son variantes de la ronda 2
+// (descartadas, sin tocar aquí) y conservan el orden clásico heredado del
+// control anterior.
+const ORDEN_CLASICO = [
+  'Los enlaces que guardas en Recordatorios, convertidos en un libro con índice para tu Kindle.',
+  'Así llega a tu Kindle',
+  'Tres pasos, cero apps nuevas',
+  '¿Y por qué no uso ya Send to Kindle?',
+  'Se queda en tu Mac',
+  'Entra en la lista de espera',
+  'Preguntas antes de apuntarte',
+]
+const ORDEN_TINTA = [
+  'Los enlaces que guardas en Recordatorios, convertidos en un libro con índice para tu Kindle.',
+  'Así llega a tu Kindle',
+  'Tres pasos, cero apps nuevas',
+  '¿Y por qué no uso ya Send to Kindle?',
+  'Se queda en tu Mac',
+  'Preguntas antes de apuntarte',
+  'Entra en la lista de espera',
+]
+
 const RUTAS = [
-  ['control /', 'dist/index.html'],
-  ['variante A /a/', 'dist/a/index.html'],
-  ['variante B /b/', 'dist/b/index.html'],
+  ['control /', 'dist/index.html', ORDEN_TINTA],
+  ['variante A /a/', 'dist/a/index.html', ORDEN_CLASICO],
+  ['variante B /b/', 'dist/b/index.html', ORDEN_CLASICO],
 ]
 
 const faltan = RUTAS.filter(([, f]) => !existsSync(f))
@@ -76,24 +100,13 @@ const INNEGOCIABLES = [
   ['demo · nota de contenido de ejemplo', 'El EPUB de la derecha usa un fichero de ejemplo con contenido de relleno'],
 ]
 
-// El orden en que el argumento tiene que leerse, sección a sección.
-const ORDEN = [
-  'Los enlaces que guardas en Recordatorios, convertidos en un libro con índice para tu Kindle.',
-  'Así llega a tu Kindle',
-  'Tres pasos, cero apps nuevas',
-  '¿Y por qué no uso ya Send to Kindle?',
-  'Se queda en tu Mac',
-  'Entra en la lista de espera',
-  'Preguntas antes de apuntarte',
-]
-
 // Ninguna cifra ni palabra de precio en ningún punto del HTML (CA de MAK-95).
 const PRECIO = ['€', '$', 'gratis', 'free']
 
 const fallos = []
 const mal = (ruta, mensaje) => fallos.push(`${ruta}: ${mensaje}`)
 
-for (const [ruta, fichero] of RUTAS) {
+for (const [ruta, fichero, ORDEN] of RUTAS) {
   const html = readFileSync(fichero, 'utf8')
   const texto = visible(html)
   const bajo = texto.toLowerCase()

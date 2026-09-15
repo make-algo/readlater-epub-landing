@@ -1,43 +1,46 @@
 ---
-import Base from '../layouts/Base.astro'
-import Header from '../components/Header.astro'
-import Footer from '../components/Footer.astro'
-import Demo from '../components/secciones/Demo.astro'
-import Pasos from '../components/secciones/Pasos.astro'
-import Comparativa from '../components/secciones/Comparativa.astro'
-import Privacidad from '../components/secciones/Privacidad.astro'
-import Cta from '../components/secciones/Cta.astro'
-import Faq from '../components/secciones/Faq.astro'
+import BaseTinta from '../layouts/BaseTinta.astro'
+import DeviceFrame from '../components/tinta/DeviceFrame.astro'
+import Hero from '../components/tinta/screens/Hero.astro'
+import Demo from '../components/tinta/screens/Demo.astro'
+import Pasos from '../components/tinta/screens/Pasos.astro'
+import Comparativa from '../components/tinta/screens/Comparativa.astro'
+import Privacidad from '../components/tinta/screens/Privacidad.astro'
+import Faq1 from '../components/tinta/screens/Faq1.astro'
+import Faq2 from '../components/tinta/screens/Faq2.astro'
+import Cta from '../components/tinta/screens/Cta.astro'
 import { hero } from '../content/copy'
 
 /**
- * Control — las siete secciones, en su orden definitivo, Fase 3 de
- * `launch-squad` (MAK-95): Héroe, Demo, Cómo funciona, Comparativa,
- * Privacidad, CTA, FAQ. Todo el texto visible sale de `src/content/copy.ts`
- * y va literal; esta página solo decide la composición. `/a/` y `/b/`
- * (Fase 4, divergencia) heredan de aquí lo que está congelado.
+ * Control — concepto B, "La página es tinta electrónica" (Fase 6 de
+ * `launch-squad`, ganadora de la ronda 3 de divergencia, MAK-143).
+ * Sustituye la pila de siete secciones del control anterior (MAK-95): esta
+ * página es un "dispositivo" de una sola pantalla que se pasa como un
+ * libro — flash de inversión + fantasma de la pantalla anterior al cambiar,
+ * índice navegable, salvapantallas por inactividad.
+ *
+ * Composición propia del concepto, no heredada: FAQ va antes que el CTA
+ * (construye el argumento y cierra dudas antes de pedir el correo), al
+ * revés que el control. `scripts/verificar.mjs` tiene su propio orden para
+ * esta ruta (`ORDEN_TINTA`) — las variantes `/a/` y `/b/`, descartadas en
+ * rondas anteriores y sin tocar aquí, siguen con el orden clásico.
+ *
+ * Todo el texto sale de `content/copy.ts` literal. El motor de paso de
+ * página vive en `lib/tinta-reader.ts`; la demo y el formulario son los
+ * componentes reales del control (`secciones/Demo.astro`,
+ * `WaitlistForm.astro`), reskinados en `styles/global-tinta.css`.
  */
 ---
 
-<Base ogTitle={hero.titular} path="/">
-  <Header />
-
-  <main id="contenido">
-    <section id="hero" class="wrap" style="padding-top: clamp(2.5rem, 6vw, 4.5rem);">
-      <h1>{hero.titular}</h1>
-      <p class="lead" style="margin-top: 1.25rem;">{hero.subtitulo}</p>
-      <p style="margin-top: 1.75rem;">
-        <a class="btn-ghost" href="#lista-de-espera">{hero.cta}</a>
-      </p>
-    </section>
-
+<BaseTinta ogTitle={hero.titular} path="/">
+  <DeviceFrame>
+    <Hero />
     <Demo />
     <Pasos />
     <Comparativa />
     <Privacidad />
+    <Faq1 />
+    <Faq2 />
     <Cta />
-    <Faq />
-  </main>
-
-  <Footer />
-</Base>
+  </DeviceFrame>
+</BaseTinta>

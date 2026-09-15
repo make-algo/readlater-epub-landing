@@ -1,0 +1,22 @@
+---
+import { pasos } from '../../../content/copy'
+---
+
+<section class="screen" id="screen-2" data-title={pasos.nombre}>
+  <div class="screen-inner">
+    <h2>{pasos.nombre}</h2>
+    <ol class="pasos-list">
+      {
+        pasos.lista.map((paso, i) => (
+          <li>
+            <span class="n">{String(i + 1).padStart(2, '0')}</span>
+            <span>
+              <strong>{paso.titulo}</strong>
+              <span>{paso.texto}</span>
+            </span>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
