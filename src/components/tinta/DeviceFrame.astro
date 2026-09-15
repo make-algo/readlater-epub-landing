@@ -1,0 +1,53 @@
+---
+/**
+ * Chrome persistente del concepto B — "La página es tinta electrónica"
+ * (Fase 6, MAK-143): barra superior/inferior, flash + capa de fantasma,
+ * zonas de borde, diálogo de índice y salvapantallas. Las ocho pantallas
+ * van en el slot, como `<section class="screen" id="screen-N">`.
+ */
+---
+
+<div class="flash-overlay" id="flashOverlay" aria-hidden="true"></div>
+<div class="ghost-layer" id="ghostLayer" aria-hidden="true"></div>
+
+<div class="device-frame">
+  <header class="chrome-top">
+    <span class="wordmark">ReadLater EPUB</span>
+    <span class="battery">e-ink · sin conexión</span>
+  </header>
+
+  <main id="main" class="stage" tabindex="-1">
+    <button type="button" class="edge-zone prev" id="edgePrev" aria-label="Pantalla anterior"></button>
+    <button type="button" class="edge-zone next" id="edgeNext" aria-label="Pantalla siguiente"></button>
+
+    <slot />
+  </main>
+
+  <footer class="chrome-bottom">
+    <span class="status" id="statusBar" aria-live="polite">Pantalla 1 de 8</span>
+    <span class="hint">↑↓ / rueda / borde / swipe para pasar página</span>
+    <button type="button" class="toc-open" id="tocOpenBtn" aria-haspopup="dialog" aria-controls="tocDialog">Índice ☰</button>
+  </footer>
+</div>
+
+<div class="screensaver" id="screensaver" aria-hidden="true">
+  <div class="cover-card">
+    <div class="cover-rule"></div>
+    <h2>El EPUB de esta semana</h2>
+    <p>Lo acumulado en Recordatorios, listo para abrirse. Toca, mueve el ratón o pulsa una tecla para volver a la lista de espera.</p>
+    <p class="cover-foot">ReadLater EPUB · en reposo</p>
+  </div>
+</div>
+
+<div class="toc-dialog" id="tocDialog" role="dialog" aria-modal="true" aria-labelledby="tocHeading">
+  <div class="toc-panel">
+    <h2 id="tocHeading">Índice</h2>
+    <p class="toc-sub">readlater · índice navegable</p>
+    <ol id="tocList"></ol>
+    <button type="button" class="toc-close" id="tocCloseBtn">Cerrar</button>
+  </div>
+</div>
+
+<script>
+  import '../../lib/tinta-reader'
+</script>

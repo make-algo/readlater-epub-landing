@@ -1,0 +1,24 @@
+---
+import { faq } from '../../../content/copy'
+
+const preguntas = faq.preguntas.slice(3)
+---
+
+<section class="screen" id="screen-6" data-title={`${faq.nombre} — 2/2`}>
+  <div class="screen-inner">
+    <h2>{faq.nombre}</h2>
+    <div class="faq-list">
+      {
+        preguntas.map((p) => (
+          <div class="faq-item">
+            <h3>{p.q}</h3>
+            <p>{p.a}</p>
+          </div>
+        ))
+      }
+    </div>
+    <div class="cta-row" style="margin-top: .6rem;">
+      <button type="button" class="btn" data-jump="7">{faq.cta}</button>
+    </div>
+  </div>
+</section>

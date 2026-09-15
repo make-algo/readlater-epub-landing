@@ -1,0 +1,21 @@
+---
+import { hero } from '../../../content/copy'
+
+/**
+ * Pantalla 0 — Portada. Concepto B, Fase 6 (MAK-143). Copy literal de
+ * `hero.*`, sin tocar. `is-active` va en el marcado servido: es la única
+ * pantalla visible si el JS no llega a arrancar (ver `BaseTinta.astro`).
+ */
+---
+
+<section class="screen is-active" id="screen-0" data-title="Portada">
+  <div class="screen-inner">
+    <p class="screen-eyebrow">ReadLater EPUB</p>
+    <h1>{hero.titular}</h1>
+    <p class="lede">{hero.subtitulo}</p>
+    <div class="cta-row">
+      <button type="button" class="btn" data-jump="7">{hero.cta}</button>
+      <span class="turn-hint">→ pasa la página para ver cómo llega a tu Kindle</span>
+    </div>
+  </div>
+</section>

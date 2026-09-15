@@ -1,0 +1,25 @@
+---
+import WaitlistForm from '../../WaitlistForm.astro'
+import { cta } from '../../../content/copy'
+
+/**
+ * Pantalla 7 — CTA/formulario. Crítica MAK-137: el mock del prototipo tenía
+ * dos botones "Entra en la lista de espera" visibles a la vez, líneas
+ * fantasma cruzando el campo de correo y radios nativos azules sin
+ * estilizar — el único color saturado de toda la página. Se sustituye el
+ * mock por `WaitlistForm.astro` real (mismos campos, honeypot `_gotcha`,
+ * fallback sin JS) y se reskinea en `global-tinta.css` (`.tinta-form`),
+ * incluido `accent-color` monocromo en los radios.
+ */
+---
+
+<section class="screen" id="screen-7" data-title={cta.nombre}>
+  <div class="screen-inner">
+    <p class="screen-eyebrow">Fin del documento</p>
+    <h2>{cta.nombre}</h2>
+    <p>{cta.intro}</p>
+    <div class="tinta-form">
+      <WaitlistForm />
+    </div>
+  </div>
+</section>

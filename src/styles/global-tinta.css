@@ -1,0 +1,360 @@
+/* ============================================================================
+   Concepto B — "La página es tinta electrónica" (Fase 6, MAK-143).
+   Ported desde `public/prototipos/b/index.html` (ronda 3, MAK-135), con las
+   correcciones de la crítica a ciegas (MAK-137, ejecución 4/10):
+
+     1. Fantasma bajado de 40-60% a un 6% de opacidad.
+     2. La demo del EPUB ya no vive aquí: se reutiliza la real de
+        `secciones/Demo.astro`, reskinada a esta paleta más abajo.
+     3. El fantasma nunca se apila — como mucho hay una instancia en el DOM
+        (ver `lib/tinta-reader.ts`).
+     4. El monocromo llega hasta los radios del formulario (`accent-color`).
+     5. Con `prefers-reduced-motion` no se crea fantasma en absoluto — el
+        JS de `tinta-reader.ts` se salta `pushGhost` en ese caso; aquí solo
+        queda una red de seguridad a opacidad 0.
+     6. Contraste, foco visible y una retícula única (`.screen-inner`).
+   ========================================================================= */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--ink);
+}
+body.tinta {
+  overflow: hidden;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+.skip-link {
+  position: fixed;
+  left: 8px;
+  top: -60px;
+  z-index: 200;
+  background: var(--ink);
+  color: var(--paper);
+  padding: .6em 1em;
+  font-size: .9rem;
+  text-decoration: none;
+  transition: top .15s;
+}
+.skip-link:focus { top: 8px; }
+
+button, input, a { font-family: inherit; }
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* ---- frame chrome (persistente, no forma parte de ninguna "pantalla") ---- */
+.device-frame {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.chrome-top {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .6rem 1rem;
+  font-family: var(--font-mono);
+  font-size: .7rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+}
+.chrome-top .wordmark { color: var(--ink); font-weight: 700; }
+
+.stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.chrome-bottom {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .55rem 1rem;
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .04em;
+  color: var(--ink);
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+}
+.chrome-bottom .status {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.chrome-bottom .status .sep { margin: 0 .5em; color: var(--ink-soft); }
+.chrome-bottom .toc-open {
+  flex: 0 0 auto;
+  background: transparent;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  padding: .35em .8em;
+  cursor: pointer;
+  font-size: .72rem;
+  letter-spacing: .04em;
+}
+.chrome-bottom .toc-open:hover { background: var(--ink); color: var(--paper); }
+.chrome-bottom .hint { color: var(--ink-soft); display: none; }
+@media (min-width: 760px) { .chrome-bottom .hint { display: inline; } }
+
+/* ---- pantallas ---- */
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  overflow-y: auto;
+  visibility: hidden;
+  opacity: 0;
+  padding: 6vh 8vw 4vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.4rem;
+}
+.screen.is-active { visibility: visible; opacity: 1; }
+
+.screen-inner { max-width: 52rem; margin: 0 auto; width: 100%; }
+
+.screen-eyebrow, .eyebrow {
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0 0 .9em;
+}
+.screen h1, .screen h2 { font-weight: 700; line-height: 1.08; margin: 0 0 .5em; letter-spacing: -.01em; }
+.screen h1 { font-size: clamp(2rem, 5.4vw, 3.6rem); }
+.screen h2 { font-size: clamp(1.5rem, 3.6vw, 2.3rem); }
+.screen p { font-size: clamp(1rem, 1.6vw, 1.2rem); line-height: 1.5; max-width: 38rem; color: var(--ink); }
+.screen p.lede { font-size: clamp(1.1rem, 2vw, 1.35rem); }
+
+.btn {
+  display: inline-block;
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--ink);
+  padding: .8em 1.4em;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  letter-spacing: .01em;
+}
+.btn:hover { background: var(--paper); color: var(--ink); }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+.btn-ghost:hover { background: var(--ink); color: var(--paper); }
+
+/* hero */
+#screen-0 .cta-row { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; margin-top: .6rem; }
+#screen-0 .turn-hint { font-family: var(--font-mono); font-size: .8rem; color: var(--ink-soft); }
+
+/* pasos */
+.pasos-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.1rem; }
+.pasos-list li { display: flex; gap: 1rem; align-items: baseline; border-top: 1px solid var(--line); padding-top: .8rem; }
+.pasos-list .n { font-family: var(--font-mono); font-size: 1rem; color: var(--ink-soft); flex: 0 0 2ch; }
+.pasos-list strong { display: block; font-size: 1.1rem; }
+.pasos-list span span { display: block; color: var(--ink-soft); font-size: .95rem; }
+
+/* comparativa */
+.comp-grid { display: grid; gap: 1.4rem; grid-template-columns: 1fr 1fr; margin: 1rem 0; }
+@media (max-width: 640px) { .comp-grid { grid-template-columns: 1fr; } }
+.comp-card { border: 1px solid var(--line); padding: 1.1rem; }
+.comp-card h3 { margin: 0 0 .5em; font-size: 1.05rem; }
+.comp-card p { font-size: .95rem; margin: 0; }
+.comp-card.win { border: 2px solid var(--ink); }
+.comp-otros { font-size: .9rem; color: var(--ink-soft); border-top: 1px dashed var(--line); padding-top: 1rem; }
+
+/* faq */
+.faq-list { margin: 0; padding: 0; display: grid; gap: .9rem; }
+.faq-item { border-top: 1px solid var(--line); padding-top: .7rem; }
+.faq-item h3 { margin: 0 0 .3em; font-size: 1.02rem; }
+.faq-item p { margin: 0; font-size: .92rem; color: var(--ink-soft); max-width: none; }
+
+/* cta / formulario real (WaitlistForm.astro) */
+.tinta-form #waitlist { display: grid; gap: 1rem; max-width: 30rem; }
+.tinta-form .field label { display: block; font-size: .85rem; font-weight: 700; margin-bottom: .35rem; }
+.tinta-form .field input[type='email'] {
+  width: 100%;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  padding: .7em .8em;
+  font-size: 1rem;
+  font: inherit;
+}
+.tinta-form .field--bad input { border-width: 2px; }
+.tinta-form .err { display: block; font-size: .8rem; color: var(--ink-soft); min-height: 1.2em; }
+.tinta-form fieldset.field { border: 1px solid var(--line); padding: .8rem; display: grid; gap: .4rem; margin-top: 1rem; }
+.tinta-form fieldset legend { font-size: .85rem; font-weight: 700; padding: 0 .3em; }
+.tinta-form .radios { display: flex; gap: 1.2rem; flex-wrap: wrap; margin-top: .5rem; }
+.tinta-form .radio { display: flex; align-items: center; gap: .4em; font-size: .92rem; font-weight: 400; }
+.tinta-form input[type='radio'] { accent-color: var(--ink); width: 1.05em; height: 1.05em; }
+.tinta-form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.tinta-form .notice { border: 1px solid var(--line); padding: .6rem .85rem; font-size: .85rem; color: var(--ink); background: transparent; }
+.tinta-form .alert { border: 1px solid var(--ink); padding: .6rem .85rem; font-size: .85rem; color: var(--ink); }
+.tinta-form .done { border-top: 1px solid var(--line); padding-top: .8rem; font-size: .95rem; }
+.tinta-form #legalnote { font-size: .75rem; color: var(--ink-soft); max-width: 34rem; margin-top: 1.25rem; }
+.tinta-form #legalnote a { color: var(--ink); }
+
+/* demo real (secciones/Demo.astro), reskinada al monocromo de tinta —
+   sin esto hereda el acento sepia y el papel crema de tokens.css, que es
+   justo lo que este concepto rompe. */
+#screen-1 .wrap { max-width: 52rem; margin-inline: auto; width: 100%; padding-inline: 0; }
+#screen-1 .demo-seccion {
+  --demo-paper: var(--paper);
+  --demo-paper-dim: var(--paper-dark);
+  --demo-ink: var(--ink);
+  --demo-ink-soft: var(--ink-soft);
+  --demo-line: var(--line);
+  --demo-accent: var(--ink);
+  --demo-flag: var(--ink-soft);
+  --demo-radius: 0px;
+  --demo-height: min(46vh, 380px);
+}
+
+/* ---- flash + fantasma e-ink ---- */
+.flash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  pointer-events: none;
+  opacity: 0;
+  background: #000;
+}
+.flash-overlay.f-black { opacity: 1; background: #000; transition: none; }
+.flash-overlay.f-white { opacity: 1; background: #fff; transition: none; }
+.flash-overlay.f-clear { opacity: 0; transition: opacity var(--flash-ms) linear; }
+
+.ghost-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  filter: blur(.3px);
+}
+.ghost-layer .ghost-shot { position: absolute; inset: 0; opacity: 0; }
+/* Crítica MAK-137: bajado de .16 (leía como texto vivo duplicado) a .06 —
+   memoria de la pantalla anterior, no un segundo texto legible. */
+.ghost-layer .ghost-shot.is-in { opacity: .06; transition: opacity 4200ms ease-out; }
+.ghost-layer .ghost-shot.is-fading { opacity: .015; }
+/* Red de seguridad: con reduced-motion el script ya no llama a pushGhost,
+   así que esto nunca debería aplicarse — se deja a 0 por si algo escapa. */
+.reduced-motion .ghost-layer .ghost-shot { transition: none !important; opacity: 0 !important; }
+
+/* ---- diálogo de índice ---- */
+.toc-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 180;
+  display: none;
+  background: rgba(22, 22, 19, .86);
+  align-items: center;
+  justify-content: center;
+  padding: 6vh 6vw;
+}
+.toc-dialog.is-open { display: flex; }
+.toc-panel {
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  max-width: 34rem;
+  width: 100%;
+  max-height: 80vh;
+  overflow: auto;
+  padding: 1.4rem;
+}
+.toc-panel h2 { margin: 0 0 .2em; font-size: 1.1rem; }
+.toc-panel .toc-sub { font-family: var(--font-mono); font-size: .72rem; color: var(--ink-soft); margin: 0 0 1em; text-transform: uppercase; letter-spacing: .08em; }
+.toc-panel ol { list-style: none; margin: 0; padding: 0; display: grid; gap: .1rem; }
+.toc-panel li { border-top: 1px solid var(--line); }
+.toc-panel li:first-child { border-top: none; }
+.toc-panel button {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+  padding: .65em .3em;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.toc-panel button:hover { background: rgba(22, 22, 19, .08); }
+.toc-panel button[aria-current='true'] { font-weight: 700; }
+.toc-panel button .idx { font-family: var(--font-mono); color: var(--ink-soft); font-size: .85rem; }
+.toc-close { margin-top: 1rem; border: 1px solid var(--ink); background: transparent; color: var(--ink); padding: .5em 1em; cursor: pointer; }
+
+/* ---- zonas de toque en el borde (pista de escritorio, funcional en todos) ---- */
+.edge-zone {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 14%;
+  z-index: 60;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+}
+.edge-zone.prev { left: 0; }
+.edge-zone.next { right: 0; }
+.edge-zone:focus-visible { outline-offset: -4px; }
+
+/* ---- salvapantallas ---- */
+.screensaver {
+  position: fixed;
+  inset: 0;
+  z-index: 170;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper);
+  text-align: center;
+  padding: 2rem;
+}
+.screensaver.is-shown { display: flex; }
+.cover-card { max-width: 22rem; }
+.cover-card .cover-rule { width: 2.4rem; height: 2px; background: var(--ink); margin: 0 auto 1.1rem; }
+.cover-card h2 { font-size: 1.7rem; margin: 0 0 .3em; line-height: 1.12; }
+.cover-card p { font-size: .85rem; color: var(--ink-soft); margin: 0 auto; max-width: 20rem; }
+.cover-card .cover-foot { margin-top: 1.6rem; font-family: var(--font-mono); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .screen { padding: 9vh 7vw 5vh; }
+  .chrome-bottom .status { font-size: .68rem; }
+}
+
+/* El fallback sin JS vive en un bloque <noscript><style> en
+   `BaseTinta.astro` (soporte real en todos los navegadores). */
