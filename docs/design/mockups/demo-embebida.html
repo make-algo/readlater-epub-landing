@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ReadLater EPUB — maqueta: Demo embebida</title>
+<style>
+  :root{
+    --paper: #F4F1EA;
+    --paper-dim: #ECE7DB;
+    --ink: #17150F;
+    --ink-soft: #524C3E;
+    --line: #D8D0BC;
+    --accent: #C1531F;
+    --accent-ink: #FBEFE6;
+    --flag: #6E3A14;
+    --flag-ink: #F6E9DD;
+    --focus: #8A3F12;
+
+    --font-serif: "Iowan Old Style","Palatino Linotype","Georgia","Times New Roman",serif;
+    --font-mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
+
+    --margin: clamp(20px, 5vw, 64px);
+    --radius: 2px;
+    --demo-height: min(72vh, 640px);
+  }
+
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-serif);
+    line-height: 1.5;
+  }
+
+  a{ color: var(--ink); }
+  a:focus-visible, button:focus-visible, [role="tab"]:focus-visible{
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  /* ---- arnés de revisión (herramienta de QA, deliberadamente fuera del sistema
+     visual del producto: gris neutro, borde discontinuo, sin ningún color de marca) ---- */
+  .review-bar{
+    position: sticky; top: 0; z-index: 50;
+    display:flex; gap: 12px; align-items:center; flex-wrap:wrap;
+    padding: 8px var(--margin);
+    background: #2B2B2B; color: #C9C9C9;
+    border-bottom: 2px dashed #6B6B6B;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .02em;
+  }
+  .review-bar .tag{
+    color: #F2C94C; font-weight: 700; letter-spacing: .08em;
+  }
+  .review-bar button{
+    font-family: var(--font-mono); font-size: 11px;
+    background: transparent; color: #C9C9C9;
+    border: 1px dashed #6B6B6B; border-radius: 0;
+    padding: 4px 9px; cursor: pointer;
+  }
+  .review-bar button[aria-pressed="true"]{
+    background: #6B6B6B; border-style: solid; border-color: #C9C9C9; color: #FFFFFF;
+  }
+
+  header.hero-stub{
+    padding: 48px var(--margin) 24px;
+    max-width: 900px;
+  }
+  header.hero-stub p.eyebrow{
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-soft); margin: 0 0 10px;
+  }
+  header.hero-stub h1{
+    font-size: clamp(24px, 3vw, 32px); margin: 0; font-weight: 600;
+  }
+
+  section.demo{
+    padding: 8px var(--margin) 64px;
+  }
+
+  /* Un solo sistema de encuadre: el filete superior marca dónde empieza la demo,
+     el resto de la separación la hace el color (paper-dim) y la línea única entre
+     columnas — nada de caja + tabs + columnas todas con borde propio. */
+  .demo-frame{
+    border-top: 2px solid var(--ink);
+    background: var(--paper);
+  }
+
+  .demo-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: var(--demo-height);
+  }
+
+  .col{
+    display:flex; flex-direction: column;
+    min-width: 0;
+  }
+  .col + .col{
+    border-left: 1px solid var(--line);
+  }
+
+  .col-label{
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-soft);
+    padding: 10px 16px; border-bottom: 1px solid var(--line);
+    display:flex; justify-content: space-between; gap: 8px;
+  }
+  .col-label .src{ color: var(--ink); font-weight: 600; }
+
+  .col-body{
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
+    overflow: hidden; /* el scroll vive DENTRO de este contenedor, nunca en el documento */
+  }
+  .col-body iframe{
+    display:block; width:100%; height:100%; border:0;
+  }
+  .iframe-scale-wrap{
+    width:100%; height:100%; overflow:hidden; position:relative;
+  }
+  .iframe-scale-wrap iframe{
+    display:block; border:0; transform-origin: 0 0;
+  }
+
+  /* --- skeleton (carga) --- */
+  .skeleton{ padding: 20px 16px; }
+  .sk-line{
+    height: 12px; margin-bottom: 12px; border-radius: var(--radius);
+    background: linear-gradient(90deg, var(--paper-dim), var(--line), var(--paper-dim));
+    background-size: 200% 100%;
+  }
+  @media (prefers-reduced-motion: no-preference){
+    .sk-line{ animation: sk-pulse 1.6s ease-in-out infinite; }
+  }
+  @keyframes sk-pulse{
+    0%{ background-position: 0% 0; }
+    100%{ background-position: -200% 0; }
+  }
+  .sk-line.w-60{ width: 60%; }
+  .sk-line.w-90{ width: 90%; }
+  .sk-line.w-40{ width: 40%; }
+  .sk-line.title{ height: 22px; width: 70%; margin-bottom: 20px; }
+
+  /* --- error / fallback estático --- */
+  .fallback{
+    position: relative; height: 100%; overflow: auto;
+  }
+  .fallback img{
+    display:block; width:100%; height:auto; filter: grayscale(.15);
+  }
+  /* Nota editorial, no alerta de sistema: mismo tratamiento que un pie de figura
+     impreso — itálica, sin caja de color, un único filete la separa de la imagen. */
+  .fallback-flag{
+    position: sticky; top: 0; left:0; right:0;
+    font-family: var(--font-serif); font-style: italic; font-size: 13px;
+    background: var(--paper); color: var(--flag);
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+
+  /* --- lector EPUB --- */
+  .reader-shell{
+    display:flex; height: 100%; min-height:0;
+  }
+  .toc{
+    width: 220px; flex: 0 0 220px;
+    border-right: 1px solid var(--line);
+    overflow-y: auto;
+    padding: 12px 0;
+    font-family: var(--font-mono); font-size: 12.5px;
+  }
+  .toc h2{
+    font-size: 10.5px; letter-spacing:.08em; text-transform:uppercase;
+    color: var(--ink-soft); margin: 0 16px 8px; font-weight: 600;
+  }
+  .toc ul{ list-style:none; margin:0; padding:0; }
+  .toc li a{
+    display:block; padding: 8px 16px; text-decoration:none; color: var(--ink);
+    border-left: 3px solid transparent;
+  }
+  .toc li a:hover{ background: var(--paper-dim); }
+  .toc li a[aria-current="true"]{
+    border-left-color: var(--accent); background: var(--paper-dim); font-weight: 600;
+  }
+  .reader-viewport{
+    flex: 1 1 auto; min-width: 0; overflow-y: auto; padding: 28px 32px;
+  }
+  .reader-viewport h1{ font-size: 20px; margin: 0 0 4px; }
+  .reader-viewport .meta{ font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); margin-bottom: 18px; }
+
+  .demo-caption{
+    font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft);
+    padding: 14px var(--margin) 0; max-width: 720px;
+  }
+
+  /* ============ MÓVIL: tabs en vez de dos columnas encogidas ============ */
+  .tabs{ display:none; }
+  @media (max-width: 767px){
+    :root{ --demo-height: 78vh; }
+    .demo-grid{ display:none; }
+    .tabs{ display:block; }
+
+    .tablist{
+      display:flex; border-bottom: 1px solid var(--line);
+    }
+    .tablist [role="tab"]{
+      flex:1 1 50%; font-family: var(--font-mono); font-size: 13px;
+      letter-spacing:.04em; text-transform:uppercase;
+      background: var(--paper); color: var(--ink-soft);
+      border:0; padding: 14px 8px;
+      cursor:pointer;
+    }
+    .tablist [role="tab"][aria-selected="true"]{
+      color: var(--ink); background: var(--paper-dim);
+      box-shadow: inset 0 -3px 0 var(--accent);
+    }
+    [role="tabpanel"]{ display:none; height: var(--demo-height); overflow: auto; position: relative; }
+    [role="tabpanel"].active{ display:block; }
+    [role="tabpanel"] .reader-shell{ height: 100%; }
+    [role="tabpanel"] .fallback{ height: auto; min-height: 100%; }
+    .toc{ width: 150px; flex: 0 0 150px; }
+    .reader-viewport{ padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="review-bar" role="toolbar" aria-label="Controles de la maqueta (no forman parte del diseño final)">
+    <span class="tag">⚑ ARNÉS DE QA — NO ES DISEÑO</span>
+    <span>MAK-93 · estado:</span>
+    <button type="button" data-state="loading" aria-pressed="true">Carga</button>
+    <button type="button" data-state="success" aria-pressed="false">Éxito</button>
+    <button type="button" data-state="error" aria-pressed="false">Error</button>
+    <span style="margin-left:auto;opacity:.7">Reduce el ancho de la ventana a &lt;768px para ver el breakpoint móvil (tabs)</span>
+  </div>
+
+  <header class="hero-stub">
+    <p class="eyebrow">Sección 2 · Demo</p>
+    <h1>Así llega a tu Kindle</h1>
+  </header>
+
+  <section class="demo" aria-label="Demostración interactiva: web original frente a EPUB generado">
+
+    <!-- ===== DESKTOP / TABLET: split-screen ===== -->
+    <div class="demo-frame demo-grid" data-view="split">
+      <div class="col">
+        <div class="col-label"><span>Web original</span><span class="src">paulgraham.com</span></div>
+        <div class="col-body" data-slot="web"></div>
+      </div>
+      <div class="col">
+        <div class="col-label"><span>EPUB generado</span><span class="src">readlater · índice navegable</span></div>
+        <div class="col-body" data-slot="epub"></div>
+      </div>
+    </div>
+
+    <!-- ===== MÓVIL: tabs ===== -->
+    <div class="demo-frame tabs" data-view="tabs">
+      <div class="tablist" role="tablist" aria-label="Alternar entre la web original y el EPUB">
+        <button role="tab" id="tab-web" aria-controls="panel-web" aria-selected="true">Web</button>
+        <button role="tab" id="tab-epub" aria-controls="panel-epub" aria-selected="false" tabindex="-1">Kindle</button>
+      </div>
+      <div role="tabpanel" id="panel-web" aria-labelledby="tab-web" class="active" data-slot="web-m"></div>
+      <div role="tabpanel" id="panel-epub" aria-labelledby="tab-epub" data-slot="epub-m" hidden></div>
+    </div>
+
+    <p class="demo-caption">Maqueta MAK-93. El EPUB de la derecha usa un fichero de ejemplo con contenido de relleno (<code>demo-epub-placeholder.epub</code>) — <code>frontend</code> lo sustituye por el EPUB real que genera la v1.0.0, mismo fichero que MAK-91. Estado inicial: <strong>Carga</strong>.</p>
+  </section>
+
+<!-- epub.js no trae JSZip empaquetado en su build minificado: sin esto, la apertura de cualquier .epub se queda colgada sin error visible (ver docs/design/02-demo-embebida.md, hallazgo de validación) -->
+<script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
+<script>
+(function(){
+  var EPUB_URL = new URL('../assets/demo-epub-placeholder.epub', document.baseURI).href;
+  var FALLBACK_IMG = new URL('../assets/fallback-web-static.png', document.baseURI).href;
+  var WEB_URL = 'https://paulgraham.com/love.html';
+
+  function skeletonHTML(){
+    // tres bloques de "párrafo" para aproximar la altura real de un capítulo,
+    // no solo un titular con unas pocas líneas sueltas arriba
+    var paragraph = '<div class="sk-line w-90"></div><div class="sk-line w-90"></div><div class="sk-line w-60"></div>';
+    return '<div class="skeleton">'
+      + '<div class="sk-line title"></div>'
+      + paragraph
+      + '<div class="sk-line w-40" style="margin-top:8px"></div>'
+      + paragraph
+      + '<div class="sk-line w-40" style="margin-top:8px"></div>'
+      + paragraph
+      + '</div>';
+  }
+
+  function fallbackHTML(){
+    return '<div class="fallback">'
+      + '<div class="fallback-flag">Vista estática — el sitio original no permite embebido en vivo</div>'
+      + '<img src="' + FALLBACK_IMG + '" alt="Captura estática de paulgraham.com/love.html, usada como alternativa cuando el iframe en vivo no carga" />'
+      + '</div>';
+  }
+
+  // paulgraham.com no es responsive: por debajo de ~560px de ancho su propio
+  // contenido desborda (comprobado: 538px de scrollWidth real a 390px de viewport)
+  // y el iframe queda con scroll horizontal propio, que es justo el "scroll interno
+  // confuso" que pide validar el criterio de aceptación. Por eso se renderiza el
+  // iframe a un ancho virtual fijo y se escala hacia abajo para que quepa sin
+  // recortarse ni generar una segunda barra de scroll horizontal.
+  var IFRAME_VIRTUAL_WIDTH = 600;
+
+  function mountWebIframe(container){
+    container.innerHTML = '<div class="iframe-scale-wrap"><iframe src="' + WEB_URL + '" title="Web original: paulgraham.com/love.html" loading="lazy" referrerpolicy="no-referrer"></iframe></div>';
+    var wrap = container.querySelector('.iframe-scale-wrap');
+    var iframe = container.querySelector('iframe');
+
+    function fit(){
+      var w = container.clientWidth;
+      var h = container.clientHeight;
+      if (w >= IFRAME_VIRTUAL_WIDTH) {
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.transform = 'none';
+      } else {
+        var scale = w / IFRAME_VIRTUAL_WIDTH;
+        iframe.style.width = IFRAME_VIRTUAL_WIDTH + 'px';
+        iframe.style.height = (h / scale) + 'px';
+        iframe.style.transform = 'scale(' + scale + ')';
+      }
+    }
+    fit();
+    window.addEventListener('resize', fit);
+  }
+
+  var readerBooks = []; // instancias epub.js activas, para poder destruirlas al cambiar de estado
+
+  function destroyReaders(){
+    readerBooks.forEach(function(b){ try{ b.destroy(); }catch(e){} });
+    readerBooks = [];
+  }
+
+  function mountReader(container){
+    container.innerHTML =
+      '<div class="reader-shell">'
+      + '<nav class="toc" aria-label="Índice del EPUB"><h2>Índice</h2><ul data-toc-list></ul></nav>'
+      + '<div class="reader-viewport" data-reader-viewport>'
+      +   '<div class="skeleton"><div class="sk-line title"></div><div class="sk-line w-90"></div><div class="sk-line w-60"></div></div>'
+      + '</div>'
+      + '</div>';
+
+    var tocList = container.querySelector('[data-toc-list]');
+    var viewport = container.querySelector('[data-reader-viewport]');
+
+    var book = ePub(EPUB_URL);
+    readerBooks.push(book);
+
+    // book.opened NUNCA rechaza si la apertura falla (comportamiento real de epub.js
+    // 0.3.93): hay que escuchar el evento 'openFailed' aparte para no colgarnos.
+    book.on('openFailed', function(err){
+      viewport.innerHTML = '<p>No se ha podido abrir el EPUB de la maqueta.</p>';
+      console.error('epub.js openFailed', err);
+    });
+
+    function renderChapter(href, label, meta){
+      viewport.innerHTML = '';
+      var h1 = document.createElement('h1'); h1.textContent = label; viewport.appendChild(h1);
+      var m = document.createElement('div'); m.className = 'meta'; m.textContent = meta || ''; viewport.appendChild(m);
+      book.load(href).then(function(doc){
+        var body = doc.querySelector('body');
+        var wrap = document.createElement('div');
+        // epub.js no expone un widget de TOC propio: el panel de la izquierda
+        // es HTML nuestro construido a partir de book.navigation.toc.
+        // Lo que sí viene resuelto por la librería es la carga/render del capítulo.
+        Array.prototype.forEach.call(body.querySelectorAll('p'), function(p){
+          var clone = document.createElement('p');
+          clone.textContent = p.textContent;
+          wrap.appendChild(clone);
+        });
+        viewport.appendChild(wrap);
+      });
+    }
+
+    book.loaded.navigation.then(function(nav){
+      tocList.innerHTML = '';
+      nav.toc.forEach(function(item, i){
+        var li = document.createElement('li');
+        var a = document.createElement('a');
+        a.href = '#';
+        a.textContent = item.label.trim();
+        a.setAttribute('aria-current', i === 0 ? 'true' : 'false');
+        a.addEventListener('click', function(ev){
+          ev.preventDefault();
+          Array.prototype.forEach.call(tocList.querySelectorAll('a'), function(x){ x.setAttribute('aria-current', 'false'); });
+          a.setAttribute('aria-current', 'true');
+          renderChapter(item.href, item.label.trim());
+        });
+        li.appendChild(a);
+        tocList.appendChild(li);
+      });
+      if (nav.toc[0]) renderChapter(nav.toc[0].href, nav.toc[0].label.trim());
+    });
+  }
+
+  function applyState(state){
+    destroyReaders();
+
+    var webSlot = document.querySelector('[data-slot="web"]');
+    var epubSlot = document.querySelector('[data-slot="epub"]');
+    var webSlotM = document.querySelector('[data-slot="web-m"]');
+    var epubSlotM = document.querySelector('[data-slot="epub-m"]');
+
+    if (state === 'loading') {
+      [webSlot, epubSlot, webSlotM, epubSlotM].forEach(function(el){ el.innerHTML = skeletonHTML(); });
+    } else if (state === 'error') {
+      [webSlot, webSlotM].forEach(function(el){ el.innerHTML = fallbackHTML(); });
+      mountReader(epubSlot);
+      mountReader(epubSlotM);
+    } else { // success
+      [webSlot, webSlotM].forEach(function(el){ mountWebIframe(el); });
+      mountReader(epubSlot);
+      mountReader(epubSlotM);
+    }
+  }
+
+  // ---- barra de control de la maqueta ----
+  var buttons = document.querySelectorAll('.review-bar button[data-state]');
+  buttons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      buttons.forEach(function(b){ b.setAttribute('aria-pressed', 'false'); });
+      btn.setAttribute('aria-pressed', 'true');
+      applyState(btn.dataset.state);
+    });
+  });
+
+  // ---- tabs móviles ----
+  var tabWeb = document.getElementById('tab-web');
+  var tabEpub = document.getElementById('tab-epub');
+  var panelWeb = document.getElementById('panel-web');
+  var panelEpub = document.getElementById('panel-epub');
+
+  function selectTab(name){
+    var webSelected = name === 'web';
+    tabWeb.setAttribute('aria-selected', webSelected ? 'true' : 'false');
+    tabEpub.setAttribute('aria-selected', webSelected ? 'false' : 'true');
+    tabWeb.tabIndex = webSelected ? 0 : -1;
+    tabEpub.tabIndex = webSelected ? -1 : 0;
+    panelWeb.hidden = !webSelected;
+    panelEpub.hidden = webSelected;
+    panelWeb.classList.toggle('active', webSelected);
+    panelEpub.classList.toggle('active', !webSelected);
+  }
+  tabWeb.addEventListener('click', function(){ selectTab('web'); });
+  tabEpub.addEventListener('click', function(){ selectTab('epub'); });
+  [tabWeb, tabEpub].forEach(function(tab, i, arr){
+    tab.addEventListener('keydown', function(ev){
+      if (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft'){
+        ev.preventDefault();
+        var other = arr[(i + 1) % arr.length];
+        other.focus();
+        selectTab(other === tabWeb ? 'web' : 'epub');
+      }
+    });
+  });
+
+  applyState('loading');
+})();
+</script>
+</body>
+</html>
