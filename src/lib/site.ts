@@ -1,9 +1,10 @@
-// La versión de prueba se sirve bajo /readlater-epub-landing/ en GitHub Pages,
-// así que ninguna ruta ni ningún asset puede escribirse como absoluto desde la
-// raíz del dominio. `BASE_URL` ya viene con la barra final que fija astro.config.mjs.
+// La versión de prueba se sirve en la raíz de readlaterepub.make-algo.com
+// (dominio propio, ver public/CNAME), así que `BASE_URL` es '/'. Se sigue
+// pasando por aquí para no volver a escribir rutas absolutas si el `base`
+// cambia en el futuro.
 const BASE = import.meta.env.BASE_URL
 
-/** Ruta interna respetando el `base` del sitio: url('/gracias') → '/readlater-epub-landing/gracias' */
+/** Ruta interna respetando el `base` del sitio: url('/gracias') → '/gracias' */
 export function url(path: string): string {
   return `${BASE.replace(/\/$/, '')}/${path.replace(/^\//, '')}`
 }
