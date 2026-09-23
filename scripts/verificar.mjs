@@ -163,7 +163,7 @@ if (!fallos.some((f) => f.includes('secreto') || f.includes('.env')))
   console.log('ok  sin secretos versionados ni endpoints reales en .env.example')
 
 // --- Sin recursos de terceros: nada que cargue de un dominio ajeno al propio.
-const PROPIO = 'https://make-algo.github.io/'
+const PROPIO = 'https://readlaterepub.make-algo.com/'
 const ajeno = (u) => /^https?:\/\//.test(u) && !u.startsWith(PROPIO)
 function cargas(texto) {
   const urls = []
