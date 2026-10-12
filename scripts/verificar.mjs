@@ -66,7 +66,7 @@ const INNEGOCIABLES = [
   ['nombre sección FAQ', 'Preguntas antes de apuntarte'],
   [
     'texto de expectativa del CTA',
-    'Todavía no hay descarga pública: la build actual no está firmada para distribución fuera de este equipo. Quien entra en la lista de espera es de los primeros en probar la beta privada en cuanto esté firmada y notarizada, y antes que nadie sabrá el precio cuando se fije. Sin spam, sin más de un email al mes.',
+    'Quien entra en la lista de espera sabrá antes que nadie el precio cuando se fije y las novedades de cada versión. Sin spam, sin más de un email al mes.',
   ],
   [
     'FAQ · Send to Kindle',
@@ -76,7 +76,8 @@ const INNEGOCIABLES = [
   ['FAQ · sin Mac', '¿Y si no tengo Mac, o no lo enciendo a diario?'],
   ['FAQ · precio', '¿Cuánto cuesta?'],
   ['FAQ · precio, respuesta', 'Aún no lo hemos fijado; quien entra en la lista de espera lo sabrá antes que nadie.'],
-  ['FAQ · descarga', '¿Cuándo hay descarga?'],
+  ['FAQ · descarga', '¿Dónde la descargo?'],
+  ['botón de descarga', 'Descargar para Mac'],
 ]
 
 // La nota "El EPUB de la derecha usa un fichero de ejemplo con contenido de

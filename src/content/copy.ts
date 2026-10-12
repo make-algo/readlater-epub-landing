@@ -24,6 +24,14 @@ export const hero = {
   cta: 'Entra en la lista de espera',
 } as const
 
+export const descargar = {
+  boton: 'Descargar para Mac',
+  /** «Versión 0.1.1 · macOS 14 o posterior · 2,1 MB» — los datos salen de lib/descarga.ts. */
+  detalle: (version: string, macos: string, megas: string) =>
+    `Versión ${version} · macOS ${macos} o posterior · ${megas} MB`,
+  nota: 'Firmada y notarizada por Apple. Se actualiza sola.',
+} as const
+
 export const demo = {
   nombre: 'Así llega a tu Kindle',
   intro:
@@ -80,9 +88,9 @@ export const privacidad = {
 
 export const cta = {
   nombre: 'Entra en la lista de espera',
-  intro: 'Todavía no hay descarga pública.',
+  intro: 'La beta ya se puede descargar.',
   expectativa:
-    'Todavía no hay descarga pública: la build actual no está firmada para distribución fuera de este equipo. Quien entra en la lista de espera es de los primeros en probar la beta privada en cuanto esté firmada y notarizada, y antes que nadie sabrá el precio cuando se fije. Sin spam, sin más de un email al mes.',
+    'Quien entra en la lista de espera sabrá antes que nadie el precio cuando se fije y las novedades de cada versión. Sin spam, sin más de un email al mes.',
   email: {
     etiqueta: 'Correo',
     placeholder: 'tú@ejemplo.com',
@@ -100,7 +108,7 @@ export const cta = {
   errorEnvio: 'Algo ha fallado al enviar el formulario. Inténtalo de nuevo en un momento.',
   ok: {
     uno: 'Ya estás en la lista con ',
-    dos: '. Te avisamos en cuanto haya beta privada.',
+    dos: '. Te avisaremos de las novedades y del precio cuando se fije.',
     extra: 'Sin spam, sin más de un email al mes.',
   },
   duplicado: 'Ese correo ya está en la lista de espera.',
@@ -134,8 +142,8 @@ export const faq = {
       a: 'Aún no lo hemos fijado; quien entra en la lista de espera lo sabrá antes que nadie.',
     },
     {
-      q: '¿Cuándo hay descarga?',
-      a: 'Todavía no hay descarga pública: la build actual no está firmada para distribución fuera de este equipo. Quien entra en la lista de espera es de los primeros en probar la beta privada en cuanto esté firmada y notarizada.',
+      q: '¿Dónde la descargo?',
+      a: 'Aquí mismo, con el botón «Descargar para Mac». La beta funciona en macOS 14 o posterior, está firmada y notarizada por Apple y se actualiza sola cuando sale una versión nueva.',
     },
   ],
   cta: 'Entra en la lista de espera',

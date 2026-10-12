@@ -196,7 +196,11 @@ button, input, a { font-family: inherit; }
 
 /* hero */
 #screen-0 .cta-row { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; margin-top: .6rem; }
-#screen-0 .turn-hint { font-family: var(--font-mono); font-size: .8rem; color: var(--ink-soft); }
+#screen-0 .turn-hint { font-family: var(--font-mono); font-size: .8rem; color: var(--ink-soft); margin-top: 1.4rem; }
+
+/* descarga: versión, sistema y tamaño en mono, como dato de sistema */
+.descarga-detalle { font-family: var(--font-mono); font-size: .8rem; color: var(--ink-soft); margin: .6rem 0 0; }
+#screen-7 .descarga { margin: 1.2rem 0 2rem; }
 
 /* pasos */
 .pasos-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.1rem; }

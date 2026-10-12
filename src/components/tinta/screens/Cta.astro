@@ -1,6 +1,7 @@
 ---
 import WaitlistForm from '../../WaitlistForm.astro'
-import { cta } from '../../../content/copy'
+import { cta, descargar } from '../../../content/copy'
+import { descarga } from '../../../lib/descarga'
 
 /**
  * Pantalla 7 — CTA/formulario. Crítica MAK-137: el mock del prototipo tenía
@@ -18,6 +19,11 @@ import { cta } from '../../../content/copy'
     <p class="screen-eyebrow">Fin del documento</p>
     <h2>{cta.nombre}</h2>
     <p>{cta.intro}</p>
+    <div class="descarga">
+      <a class="btn" href={descarga.url}>{descargar.boton}</a>
+      <p class="descarga-detalle">{descargar.detalle(descarga.version, descarga.macos, descarga.megas)}</p>
+      <p class="descarga-detalle">{descargar.nota}</p>
+    </div>
     <div class="tinta-form">
       <WaitlistForm />
     </div>

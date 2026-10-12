@@ -1,5 +1,6 @@
 ---
-import { hero } from '../../../content/copy'
+import { hero, descargar } from '../../../content/copy'
+import { descarga } from '../../../lib/descarga'
 
 /**
  * Pantalla 0 — Portada. Concepto B, Fase 6 (MAK-143). Copy literal de
@@ -14,8 +15,10 @@ import { hero } from '../../../content/copy'
     <h1>{hero.titular}</h1>
     <p class="lede">{hero.subtitulo}</p>
     <div class="cta-row">
-      <button type="button" class="btn" data-jump="7">{hero.cta}</button>
-      <span class="turn-hint">→ pasa la página para ver cómo llega a tu Kindle</span>
+      <a class="btn" href={descarga.url}>{descargar.boton}</a>
+      <button type="button" class="btn btn-ghost" data-jump="7">{hero.cta}</button>
     </div>
+    <p class="descarga-detalle">{descargar.detalle(descarga.version, descarga.macos, descarga.megas)}</p>
+    <p class="turn-hint">→ pasa la página para ver cómo llega a tu Kindle</p>
   </div>
 </section>
