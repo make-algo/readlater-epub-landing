@@ -1,5 +1,6 @@
 ---
-import { faq } from '../../../content/copy'
+import { faq, descargar } from '../../../content/copy'
+import { descarga } from '../../../lib/descarga'
 
 const preguntas = faq.preguntas.slice(3)
 ---
@@ -18,7 +19,7 @@ const preguntas = faq.preguntas.slice(3)
       }
     </div>
     <div class="cta-row" style="margin-top: .6rem;">
-      <button type="button" class="btn" data-jump="7">{faq.cta}</button>
+      <a class="btn" href={descarga.url}>{descargar.boton}</a>
     </div>
   </div>
 </section>

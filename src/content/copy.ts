@@ -21,7 +21,6 @@ export const hero = {
     'Los enlaces que guardas en Recordatorios, convertidos en un libro con índice para tu Kindle.',
   subtitulo:
     'ReadLater EPUB junta lo que acumulas en Recordatorios y genera un único EPUB navegable — sin cuenta, sin nube, sin mandarlos uno a uno.',
-  cta: 'Entra en la lista de espera',
 } as const
 
 export const descargar = {
@@ -87,43 +86,12 @@ export const privacidad = {
 } as const
 
 export const cta = {
-  nombre: 'Entra en la lista de espera',
-  intro: 'La beta ya se puede descargar.',
-  expectativa:
-    'Quien entra en la lista de espera sabrá antes que nadie el precio cuando se fije y las novedades de cada versión. Sin spam, sin más de un email al mes.',
-  email: {
-    etiqueta: 'Correo',
-    placeholder: 'tú@ejemplo.com',
-    error: 'Escribe un correo con formato válido.',
-  },
-  kindle: {
-    etiqueta: '¿Tienes Kindle?',
-    opciones: ['Sí', 'No', 'Tengo otro e-reader'],
-  },
-  boton: {
-    reposo: 'Entra en la lista de espera',
-    enviando: 'Enviando…',
-  },
-  sinEndpoint: 'El alta todavía no está operativa en esta versión de prueba.',
-  errorEnvio: 'Algo ha fallado al enviar el formulario. Inténtalo de nuevo en un momento.',
-  ok: {
-    uno: 'Ya estás en la lista con ',
-    dos: '. Te avisaremos de las novedades y del precio cuando se fije.',
-    extra: 'Sin spam, sin más de un email al mes.',
-  },
-  duplicado: 'Ese correo ya está en la lista de espera.',
-  legal: {
-    titulo: 'Protección de datos. ',
-    uno: 'Tu correo se usa solo para avisarte de la beta privada. Más detalle en la ',
-    enlace: 'política de privacidad',
-    dos: '. Responsable: Make Algo SL. ',
-    pendiente: 'Proveedor de envío del formulario: Formspree.',
-    tres: '',
-  },
+  nombre: 'Descárgala para tu Mac',
+  intro: 'Sin cuenta y sin límites: descarga la app, elige tu lista de Recordatorios y genera el primer EPUB.',
 } as const
 
 export const faq = {
-  nombre: 'Preguntas antes de apuntarte',
+  nombre: 'Preguntas antes de descargarla',
   preguntas: [
     {
       q: '¿Por qué no uso directamente Send to Kindle?',
@@ -139,12 +107,11 @@ export const faq = {
     },
     {
       q: '¿Cuánto cuesta?',
-      a: 'Aún no lo hemos fijado; quien entra en la lista de espera lo sabrá antes que nadie.',
+      a: 'Hoy se descarga y se usa entera, sin límites ni cuenta.',
     },
     {
       q: '¿Dónde la descargo?',
-      a: 'Aquí mismo, con el botón «Descargar para Mac». La beta funciona en macOS 14 o posterior, está firmada y notarizada por Apple y se actualiza sola cuando sale una versión nueva.',
+      a: 'Aquí mismo, con el botón «Descargar para Mac». Funciona en macOS 14 o posterior, está firmada y notarizada por Apple y se actualiza sola cuando sale una versión nueva.',
     },
   ],
-  cta: 'Entra en la lista de espera',
 } as const

@@ -1,14 +1,15 @@
 ---
 import { url } from '../lib/site'
+import { descargar } from '../content/copy'
+import { descarga } from '../lib/descarga'
 
 /**
  * Marca — serif para el nombre de lectura + etiqueta de sistema para el
  * formato, separadas por un filete (00-identidad-visual.md: "un filete de
  * 1-2px, como el lomo que separa dos páginas de un libro"). Antes era un
  * icono genérico + texto en negrita, indistinguible de cualquier cabecera
- * de SaaS. El CTA de nav pasa a `.btn-ghost`: es refuerzo, no la conversión
- * — esa vive en la sección CTA (`Cta.astro` → `WaitlistForm`), único sitio
- * con `.btn` sólido.
+ * de SaaS. El enlace de descarga va en `.btn-ghost`: es refuerzo en las
+ * páginas secundarias (privacidad, 404).
  */
 ---
 
@@ -20,5 +21,5 @@ import { url } from '../lib/site'
       <span class="marca-formato">EPUB</span>
     </span>
   </a>
-  <a class="btn-ghost" href="#lista-de-espera">Entra en la lista de espera</a>
+  <a class="btn-ghost" href={descarga.url}>{descargar.boton}</a>
 </header>

@@ -20,15 +20,15 @@ import { hero } from '../content/copy'
  * índice navegable, salvapantallas por inactividad.
  *
  * Composición propia del concepto, no heredada: FAQ va antes que el CTA
- * (construye el argumento y cierra dudas antes de pedir el correo), al
+ * (construye el argumento y cierra dudas antes de la descarga), al
  * revés que el control. `scripts/verificar.mjs` tiene su propio orden para
  * esta ruta (`ORDEN_TINTA`) — las variantes `/a/` y `/b/`, descartadas en
  * rondas anteriores y sin tocar aquí, siguen con el orden clásico.
  *
  * Todo el texto sale de `content/copy.ts` literal. El motor de paso de
- * página vive en `lib/tinta-reader.ts`; la demo y el formulario son los
- * componentes reales del control (`secciones/Demo.astro`,
- * `WaitlistForm.astro`), reskinados en `styles/global-tinta.css`.
+ * página vive en `lib/tinta-reader.ts`; la demo es el componente real del
+ * control (`secciones/Demo.astro`), reskinado en `styles/global-tinta.css`.
+ * La última pantalla es la descarga (antes, la lista de espera).
  */
 ---
 

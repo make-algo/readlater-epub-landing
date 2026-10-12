@@ -12,7 +12,7 @@
  *     conservaba el fantasma a plena intensidad).
  *   - El foco tras pasar de página se fuerza a la cabecera de la pantalla
  *     de destino aunque el componente no le haya puesto `tabindex="-1"` —
- *     así los screens que reutilizan componentes reales (Demo, WaitlistForm)
+ *     así los screens que reutilizan componentes reales (Demo)
  *     no necesitan tocar su propio marcado para ser accesibles aquí.
  *   - `pushGhost` nunca se llama al ENTRAR en una pantalla marcada
  *     `data-no-ghost` (la del formulario, MAK-154): el fantasma es memoria

@@ -17,15 +17,15 @@ import { join } from 'node:path'
 
 // El control (MAK-143, concepto B ganador — "la página es tinta
 // eléctrica") compone FAQ antes que CTA: construye el argumento y cierra
-// dudas antes de pedir el correo.
+// dudas antes de la descarga.
 const ORDEN_TINTA = [
   'Los enlaces que guardas en Recordatorios, convertidos en un libro con índice para tu Kindle.',
   'Así llega a tu Kindle',
   'Tres pasos, cero apps nuevas',
   '¿Y por qué no uso ya Send to Kindle?',
   'Se queda en tu Mac',
-  'Preguntas antes de apuntarte',
-  'Entra en la lista de espera',
+  'Preguntas antes de descargarla',
+  'Descárgala para tu Mac',
 ]
 
 const RUTAS = [['control /', 'dist/index.html', ORDEN_TINTA]]
@@ -62,12 +62,8 @@ const INNEGOCIABLES = [
   ['nombre sección Cómo funciona', 'Tres pasos, cero apps nuevas'],
   ['nombre sección Comparativa', '¿Y por qué no uso ya Send to Kindle?'],
   ['nombre sección Privacidad', 'Se queda en tu Mac'],
-  ['nombre sección CTA', 'Entra en la lista de espera'],
-  ['nombre sección FAQ', 'Preguntas antes de apuntarte'],
-  [
-    'texto de expectativa del CTA',
-    'Quien entra en la lista de espera sabrá antes que nadie el precio cuando se fije y las novedades de cada versión. Sin spam, sin más de un email al mes.',
-  ],
+  ['nombre sección descarga', 'Descárgala para tu Mac'],
+  ['nombre sección FAQ', 'Preguntas antes de descargarla'],
   [
     'FAQ · Send to Kindle',
     '¿Por qué no uso directamente Send to Kindle?',
@@ -75,7 +71,7 @@ const INNEGOCIABLES = [
   ['FAQ · competidores en la nube', '¿Por qué no Instapaper/Readwise/Matter, que ya hacen de todo?'],
   ['FAQ · sin Mac', '¿Y si no tengo Mac, o no lo enciendo a diario?'],
   ['FAQ · precio', '¿Cuánto cuesta?'],
-  ['FAQ · precio, respuesta', 'Aún no lo hemos fijado; quien entra en la lista de espera lo sabrá antes que nadie.'],
+  ['FAQ · precio, respuesta', 'Hoy se descarga y se usa entera, sin límites ni cuenta.'],
   ['FAQ · descarga', '¿Dónde la descargo?'],
   ['botón de descarga', 'Descargar para Mac'],
 ]
@@ -114,13 +110,11 @@ for (const [ruta, fichero, ORDEN] of RUTAS) {
   const encontradas = PRECIO.filter((c) => bajo.includes(c.toLowerCase()))
   if (encontradas.length) mal(ruta, `aparece precio: ${encontradas.map((c) => `«${c}»`).join(', ')}`)
 
-  if (!/name="email"[^>]*type="email"|type="email"[^>]*name="email"/.test(html))
-    mal(ruta, 'el formulario no tiene un campo email')
-  if (!texto.includes('¿Tienes Kindle?')) mal(ruta, 'falta la pregunta «¿Tienes Kindle?»')
-  for (const opcion of ['Sí', 'No', 'Tengo otro e-reader'])
-    if (!texto.includes(opcion)) mal(ruta, `falta la opción «${opcion}» de la pregunta Kindle`)
-
-  if (!/name="_gotcha"/.test(html)) mal(ruta, 'el honeypot del formulario no se llama _gotcha')
+  // Ya no hay lista de espera: ni formulario de correo ni referencias a una beta.
+  if (/<form\b/i.test(html) || /type="email"/.test(html)) mal(ruta, 'queda un formulario de correo')
+  if (/\bbeta\b|lista de espera/i.test(texto)) mal(ruta, 'quedan referencias a la beta o a la lista de espera')
+  if (!/href="https:\/\/github\.com\/make-algo\/readlater-epub-landing\/releases\/download\/actualizaciones\/[^"]+\.dmg"/.test(html))
+    mal(ruta, 'falta el enlace de descarga al DMG de la release «actualizaciones»')
 
   // --- Demo embebida (MAK-101): split-screen accesible con fallback a tabs en móvil.
   if (!/role="tablist"/.test(html) || !/role="tab"/.test(html) || !/role="tabpanel"/.test(html))
@@ -138,15 +132,12 @@ for (const [ruta, fichero, ORDEN] of RUTAS) {
 
   if (!/<meta name="robots" content="noindex/.test(html)) mal(ruta, 'falta el noindex')
 
-  if (fallos.length === errores) console.log(`ok  ${ruta} · copy, orden, formulario, demo y metadatos`)
+  if (fallos.length === errores) console.log(`ok  ${ruta} · copy, orden, descarga, demo y metadatos`)
 }
 
 // --- Sin secretos: ni claves ni endpoints reales versionados. El .env.example
 //     va vacío y no se commitea ningún .env real.
 if (existsSync('.env')) fallos.push('hay un .env versionado en el repo — nunca debe existir')
-const envExample = existsSync('.env.example') ? readFileSync('.env.example', 'utf8') : ''
-if (/PUBLIC_FORM_ENDPOINT=.+/.test(envExample.replace(/#.*$/gm, '').trim()))
-  fallos.push('.env.example trae un valor real en PUBLIC_FORM_ENDPOINT — debe ir vacío')
 const SECRETOS = [/sk-[a-zA-Z0-9]{16,}/, /AKIA[0-9A-Z]{16}/, /-----BEGIN [A-Z ]*PRIVATE KEY-----/]
 function ficheros(dir, ext) {
   if (!existsSync(dir)) return []
@@ -161,7 +152,7 @@ for (const f of [...ficheros('src', '.astro'), ...ficheros('src', '.ts'), ...fic
   for (const patron of SECRETOS) if (patron.test(texto)) fallos.push(`${f}: parece contener un secreto`)
 }
 if (!fallos.some((f) => f.includes('secreto') || f.includes('.env')))
-  console.log('ok  sin secretos versionados ni endpoints reales en .env.example')
+  console.log('ok  sin secretos versionados')
 
 // --- Sin recursos de terceros: nada que cargue de un dominio ajeno al propio.
 const PROPIO = 'https://readlaterepub.make-algo.com/'
@@ -220,7 +211,6 @@ if (fallos.length === erroresPrevios)
 //     solo queda el control.
 const RUTAS_ESPERADAS = [
   'dist/index.html',
-  'dist/gracias/index.html',
   'dist/privacidad/index.html',
   'dist/404.html',
 ]

@@ -224,32 +224,6 @@ button, input, a { font-family: inherit; }
 .faq-item h3 { margin: 0 0 .3em; font-size: 1.02rem; }
 .faq-item p { margin: 0; font-size: .92rem; color: var(--ink-soft); max-width: none; }
 
-/* cta / formulario real (WaitlistForm.astro) */
-.tinta-form #waitlist { display: grid; gap: 1rem; max-width: 30rem; }
-.tinta-form .field label { display: block; font-size: .85rem; font-weight: 700; margin-bottom: .35rem; }
-.tinta-form .field input[type='email'] {
-  width: 100%;
-  border: 1px solid var(--ink);
-  background: var(--paper);
-  color: var(--ink);
-  padding: .7em .8em;
-  font-size: 1rem;
-  font: inherit;
-}
-.tinta-form .field--bad input { border-width: 2px; }
-.tinta-form .err { display: block; font-size: .8rem; color: var(--ink-soft); min-height: 1.2em; }
-.tinta-form fieldset.field { border: 1px solid var(--line); padding: .8rem; display: grid; gap: .4rem; margin-top: 1rem; }
-.tinta-form fieldset legend { font-size: .85rem; font-weight: 700; padding: 0 .3em; }
-.tinta-form .radios { display: flex; gap: 1.2rem; flex-wrap: wrap; margin-top: .5rem; }
-.tinta-form .radio { display: flex; align-items: center; gap: .4em; font-size: .92rem; font-weight: 400; }
-.tinta-form input[type='radio'] { accent-color: var(--ink); width: 1.05em; height: 1.05em; }
-.tinta-form .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-.tinta-form .notice { border: 1px solid var(--line); padding: .6rem .85rem; font-size: .85rem; color: var(--ink); background: transparent; }
-.tinta-form .alert { border: 1px solid var(--ink); padding: .6rem .85rem; font-size: .85rem; color: var(--ink); }
-.tinta-form .done { border-top: 1px solid var(--line); padding-top: .8rem; font-size: .95rem; }
-.tinta-form #legalnote { font-size: .75rem; color: var(--ink-soft); max-width: 34rem; margin-top: 1.25rem; }
-.tinta-form #legalnote a { color: var(--ink); }
-
 /* demo real (secciones/Demo.astro), reskinada al monocromo de tinta —
    sin esto hereda el acento sepia y el papel crema de tokens.css, que es
    justo lo que este concepto rompe. */
