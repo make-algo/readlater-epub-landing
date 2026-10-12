@@ -3,6 +3,18 @@
     <channel>
         <title>ReadLaterEPUB</title>
         <item>
+            <title>0.1.2</title>
+            <pubDate>Mon, 12 Oct 2026 20:00:27 +0200</pubDate>
+            <link>https://readlaterepub.make-algo.com</link>
+            <sparkle:version>3</sparkle:version>
+            <sparkle:shortVersionString>0.1.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/make-algo/readlater-epub-landing/releases/download/actualizaciones/ReadLaterEPUB-0.1.2.dmg" length="2106197" type="application/octet-stream" sparkle:edSignature="OxjBquvkEMbUlzR7M5HKorJWAMEjjYkR+KwL6x/201SsEXDjWzjaF2tdY7Tw8Wr09kSFxVAihUG+Eod03oJbDg=="/>
+            <sparkle:deltas>
+                <enclosure url="https://github.com/make-algo/readlater-epub-landing/releases/download/actualizaciones/ReadLaterEPUB3-2.delta" sparkle:deltaFrom="2" length="14078" type="application/octet-stream" sparkle:deltaFromSparkleExecutableSize="976432" sparkle:deltaFromSparkleLocales="de,he,ar,el,ja,fa,uk" sparkle:edSignature="t5clcTEFKdPSLnNLXRxoGhNssEKi29VHARDZocmeDK0zrtuoggnseXd6l204CdzffV7IiTI0nd7HyAfGDxoPDQ=="/>
+            </sparkle:deltas>
+        </item>
+        <item>
             <title>0.1.1</title>
             <pubDate>Mon, 12 Oct 2026 19:44:51 +0200</pubDate>
             <link>https://readlaterepub.make-algo.com</link>
