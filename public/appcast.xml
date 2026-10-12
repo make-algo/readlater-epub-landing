@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>ReadLaterEPUB</title>
+        <item>
+            <title>0.1.1</title>
+            <pubDate>Mon, 12 Oct 2026 19:44:51 +0200</pubDate>
+            <link>https://readlaterepub.make-algo.com</link>
+            <sparkle:version>2</sparkle:version>
+            <sparkle:shortVersionString>0.1.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/make-algo/readlater-epub-landing/releases/download/actualizaciones/ReadLaterEPUB-0.1.1.dmg" length="2106813" type="application/octet-stream" sparkle:edSignature="IjYeiJCNeEJhJnJXFDx8NV3n53xbaaU/zy60ekRE7wGCrzipE7QvFPxp0OZ1lZ0LlHEMbC0xuVLvH0bZpTTpDg=="/>
+        </item>
+    </channel>
+</rss>
